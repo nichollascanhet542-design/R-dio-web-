@@ -318,14 +318,19 @@
             font-weight: 600;
         }
 
-        /* BOTÃO DIRETO PARA CARREGAR MÚSICAS DO CELULAR */
+        /* BOTÃO DIRETO PARA CARREGAR MÚSICAS DO CELULAR (OCULTO ATÉ DESBLOQUEAR MODO CRIADOR) */
         .upload-quick-box {
+            display: none;
             background: rgba(255, 85, 0, 0.1);
             border: 1px dashed var(--accent);
             border-radius: 12px;
             padding: 12px;
             margin-top: 14px;
             text-align: center;
+        }
+
+        .upload-quick-box.unlocked {
+            display: block;
         }
 
         .btn-upload-device {
@@ -667,7 +672,7 @@
         </div>
         <div class="header-actions">
             <button class="icon-btn" onclick="shareRadio()" title="Compartilhar">📲</button>
-            <button class="icon-btn" id="btnCreatorToggle" onclick="toggleCreatorMode()" title="Modo Criador (Senha: 1234)">🔒</button>
+            <button class="icon-btn" id="btnCreatorToggle" onclick="toggleCreatorMode()" title="Acesso Restrito">🔒</button>
         </div>
     </header>
 
@@ -680,7 +685,7 @@
 
     <div class="container">
 
-        <!-- PAINEL DO MODO CRIADOR (OCULTO POR SENHA) -->
+        <!-- PAINEL DO MODO CRIADOR (OCULTO POR SENHA CRIPTOGRAFADA) -->
         <div id="creatorModal">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                 <h3 style="color:var(--accent-light); font-size:15px;">⚙️ Painel do Modo Criador Ativo</h3>
@@ -764,14 +769,14 @@
                 <input type="range" min="0" max="1" step="0.05" value="1" oninput="changeVolume(this.value)" style="flex:1; accent-color:var(--accent);">
             </div>
 
-            <!-- BOTÃO DIRETO PARA CARREGAR MÚSICA DO CELULAR -->
-            <div class="upload-quick-box">
+            <!-- BOTÃO DIRETO PARA CARREGAR MÚSICA (SÓ APARECE QUANDO VOCÊ DESTRANCA O CADEADO) -->
+            <div class="upload-quick-box" id="quickUploadBox">
                 <input type="file" id="quickAudioInput" accept="audio/*" multiple style="display:none;" onchange="handleQuickUpload(this.files)">
                 <button class="btn-upload-device" onclick="document.getElementById('quickAudioInput').click()">
                     📂 Escolher Músicas do Meu Celular para Tocar
                 </button>
                 <div style="font-size:11px; color:var(--text-muted); margin-top:6px;">
-                    Selecione 1 ou várias músicas MP3 da memória do seu aparelho. Elas ficam salvas na sua playlist!
+                    Modo Criador Ativo: Selecione 1 ou várias músicas MP3 da memória do seu aparelho.
                 </div>
             </div>
         </div>
@@ -792,7 +797,7 @@
             </div>
 
             <div class="info-notice">
-                ✔ <strong>Transmissão Direta Ativada:</strong> Áudio HTML5 sem bloqueios do YouTube. Ouça as rádios online, as faixas livres de direitos autorais abaixo ou toque a playlist salva do seu celular!
+                ✔ <strong>Transmissão Direta Ativada:</strong> Áudio HTML5 sem bloqueios do YouTube. Ouça as rádios online, as faixas livres de direitos autorais abaixo ou toque a playlist programada!
             </div>
 
             <div class="section-label">ESCOLHA A PROGRAMAÇÃO AGORA:</div>
@@ -815,13 +820,13 @@
                 <div class="schedule-card" id="sched-3" onclick="playSchedule(3)">
                     <div class="sched-top"><span>🎵</span><span>24 Horas</span></div>
                     <div class="sched-name">Minha Playlist</div>
-                    <div class="sched-sub">Músicas do Celular & Roteiro</div>
+                    <div class="sched-sub">Músicas & Roteiro Especial</div>
                 </div>
             </div>
 
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div class="section-label">ROTEIRO & PLAYLIST SALVA (SEM BLOQUEIO):</div>
-                <button onclick="clearSavedSongs()" style="background:none; border:none; color:var(--text-muted); font-size:11px; cursor:pointer; text-decoration:underline;">Limpar locais</button>
+                <button id="btnClearLocal" onclick="clearSavedSongs()" style="display:none; background:none; border:none; color:var(--text-muted); font-size:11px; cursor:pointer; text-decoration:underline;">Limpar locais</button>
             </div>
             <div id="playlistContainer"></div>
         </div>
@@ -833,7 +838,7 @@
                 <span class="status-pill">Parceiros Oficiais</span>
             </div>
             <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">
-                Confira as ofertas especiais dos nossos parceiros ou entre no Modo Criador (🔒) para cadastrar novos anunciantes.
+                Confira as ofertas especiais dos nossos parceiros e patrocinadores oficiais.
             </p>
             <div class="stores-grid" id="storesContainer"></div>
         </div>
@@ -854,7 +859,7 @@
 
     <script>
         const audio = document.getElementById('radioAudio');
-        let sourceMode = 'radio'; // 'radio' ou 'playlist'
+        let sourceMode = 'radio';
         let currentStationIndex = 0;
         let currentTrackIndex = 0;
         let isPlaying = false;
@@ -862,7 +867,17 @@
         let timerSeconds = 0;
         let timerInterval = null;
 
-        // 1. ESTAÇÕES DE RÁDIO ABERTAS E COM FALLBACK GARANTIDO (NUNCA FICAM MUDAS)
+        // HASH SHA-256 CRIPTOGRAFADO (A SENHA NÃO EXISTE NO CÓDIGO)
+        const SECRET_HASH = "5989b44b19816b62201417d9a77e048b99771968466420e4d23c100f80b1812b";
+
+        async function sha256(texto) {
+            const msgBuffer = new TextEncoder().encode(texto);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // 1. ESTAÇÕES DE RÁDIO ABERTAS E COM FALLBACK GARANTIDO
         const stations = [
             {
                 name: 'Rádio Sertanejo Universitário & Raiz (24h)',
@@ -974,6 +989,7 @@
         }
 
         function clearSavedSongs() {
+            if (!creatorUnlocked) return;
             if (!confirm('Deseja limpar as músicas adicionadas do celular e manter apenas as originais?')) return;
             localStorage.removeItem('radio_custom_urls');
             if (db) {
@@ -984,18 +1000,20 @@
             renderPlaylist();
         }
 
-        // UPLOAD RÁPIDO DIRETO DO BOTÃO VERDE DO PLAYER
+        // UPLOAD RÁPIDO (SÓ FUNCIONA COM MODO CRIADOR DESTRANCADO)
         function handleQuickUpload(files) {
+            if (!creatorUnlocked) {
+                alert('Acesso restrito ao administrador.');
+                return;
+            }
             if (!files || files.length === 0) return;
             let firstNewUrl = null;
-            let firstTitle = '';
 
             Array.from(files).forEach((file, index) => {
                 const cleanName = file.name.replace(/\.[^/.]+$/, "");
                 const objectUrl = URL.createObjectURL(file);
                 if (index === 0) {
                     firstNewUrl = objectUrl;
-                    firstTitle = '📱 ' + cleanName;
                 }
                 tracks.unshift({
                     title: '📱 ' + cleanName,
@@ -1013,6 +1031,7 @@
 
         // UPLOAD PELO MODO CRIADOR
         function handleCreatorFiles() {
+            if (!creatorUnlocked) return;
             const input = document.getElementById('creatorFileInput');
             if (!input.files || input.files.length === 0) {
                 alert('Selecione pelo menos um arquivo de áudio do seu aparelho!');
@@ -1024,6 +1043,7 @@
         }
 
         function addCustomUrlTrack() {
+            if (!creatorUnlocked) return;
             const title = document.getElementById('customTrackTitle').value.trim();
             const url = document.getElementById('customTrackUrl').value.trim();
             if (!title || !url) {
@@ -1222,23 +1242,33 @@
             clearInterval(timerInterval);
         }
 
-        // 5. MODO CRIADOR E GESTÃO DE PROPAGANDAS E LOJAS
-        function toggleCreatorMode() {
+        // 5. MODO CRIADOR PROTEGIDO POR HASH CRIPTOGRÁFICO
+        async function toggleCreatorMode() {
             const modal = document.getElementById('creatorModal');
             const btn = document.getElementById('btnCreatorToggle');
+            const quickBox = document.getElementById('quickUploadBox');
+            const btnClear = document.getElementById('btnClearLocal');
+
             if (!creatorUnlocked) {
-                const pass = prompt('Digite a senha do Modo Criador (Padrão: 1234):');
-                if (pass === '1234' || pass === 'admin') {
+                const pass = prompt('🔒 Área Restrita do Administrador.\nDigite a sua chave de acesso:');
+                if (pass === null) return;
+
+                const inputHash = await sha256(pass.trim());
+                if (inputHash === SECRET_HASH) {
                     creatorUnlocked = true;
                     modal.classList.add('open');
+                    quickBox.classList.add('unlocked');
+                    btnClear.style.display = 'inline-block';
                     btn.classList.add('creator-active');
                     btn.innerText = '🔓';
-                } else if (pass !== null) {
-                    alert('Senha incorreta!');
+                } else {
+                    alert('Acesso negado! Senha incorreta.');
                 }
             } else {
                 creatorUnlocked = false;
                 modal.classList.remove('open');
+                quickBox.classList.remove('unlocked');
+                btnClear.style.display = 'none';
                 btn.classList.remove('creator-active');
                 btn.innerText = '🔒';
             }
@@ -1255,6 +1285,7 @@
         }
 
         function saveBannerAd() {
+            if (!creatorUnlocked) return;
             const title = document.getElementById('adTitleInput').value.trim();
             const desc = document.getElementById('adDescInput').value.trim();
             const link = document.getElementById('adLinkInput').value.trim();
@@ -1278,7 +1309,7 @@
             const stores = JSON.parse(localStorage.getItem('radio_partner_stores')) || defaultStores;
             const container = document.getElementById('storesContainer');
             container.innerHTML = '';
-            stores.forEach((st, idx) => {
+            stores.forEach((st) => {
                 const card = document.createElement('div');
                 card.className = 'store-card';
                 card.innerHTML = `
@@ -1294,6 +1325,7 @@
         }
 
         function addPartnerStore() {
+            if (!creatorUnlocked) return;
             const name = document.getElementById('storeNameInput').value.trim();
             const offer = document.getElementById('storeOfferInput').value.trim();
             const url = document.getElementById('storeUrlInput').value.trim() || '#';
