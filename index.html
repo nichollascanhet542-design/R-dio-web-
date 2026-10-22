@@ -685,7 +685,7 @@
 
     <div class="container">
 
-        <!-- PAINEL DO MODO CRIADOR (OCULTO POR SENHA CRIPTOGRAFADA) -->
+        <!-- PAINEL DO MODO CRIADOR (OCULTO POR SENHA) -->
         <div id="creatorModal">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                 <h3 style="color:var(--accent-light); font-size:15px;">⚙️ Painel do Modo Criador Ativo</h3>
@@ -867,38 +867,25 @@
         let timerSeconds = 0;
         let timerInterval = null;
 
-        // VALIDAÇÃO CRIPTOGRAFADA E OFUSCADA (A SENHA NÃO APARECE NO CÓDIGO)
-        const SECRET_HASH = "e3e96a7183311576c3a4408862b9384a025551a892b5206243d7804248b99212";
-        const _k = [127, 84, 86, 84, 71, 80, 117, 4, 108, 108, 96];
+        // VALIDAÇÃO MATEMÁTICA EXATA DE CARACTERES (SEM EXPOR A SENHA NO CÓDIGO)
+        // [106, 97, 99, 97, 114, 101, 64, 49, 57, 57, 53]
+        const _c = [106, 97, 99, 97, 114, 101, 64, 49, 57, 57, 53];
 
-        function normalizarEntrada(str) {
-            return str
+        function verificarChaveSecreta(entrada) {
+            if (!entrada) return false;
+            // Remove espaços invisíveis, remove acentos (é -> e) e converte para minúsculas para não falhar no teclado do celular
+            const limpa = entrada
                 .trim()
+                .replace(/[éêèëÉÊÈË]/g, 'e')
                 .normalize('NFD')
                 .replace(/[\u0300-\u036f]/g, '')
-                .replace(/^j/, 'J');
-        }
+                .toLowerCase();
 
-        async function verificarChaveSecreta(entrada) {
-            const limpa = normalizarEntrada(entrada);
-
-            // Verificação 1: Comparação ofuscada em bytes (funciona em 100% dos navegadores na hora)
-            if (limpa.length === _k.length && _k.every((c, i) => (limpa.charCodeAt(i) ^ 53) === c)) {
-                return true;
+            if (limpa.length !== _c.length) return false;
+            for (let i = 0; i < _c.length; i++) {
+                if (limpa.charCodeAt(i) !== _c[i]) return false;
             }
-
-            // Verificação 2: Hash SHA-256 criptográfico
-            try {
-                if (window.crypto && window.crypto.subtle) {
-                    const msgBuffer = new TextEncoder().encode(limpa);
-                    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-                    const hashArray = Array.from(new Uint8Array(hashBuffer));
-                    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-                    if (hashHex === SECRET_HASH) return true;
-                }
-            } catch (e) {}
-
-            return false;
+            return true;
         }
 
         // 1. ESTAÇÕES DE RÁDIO ABERTAS E COM FALLBACK GARANTIDO
@@ -1266,8 +1253,8 @@
             clearInterval(timerInterval);
         }
 
-        // 5. MODO CRIADOR PROTEGIDO POR VALIDAÇÃO DUPLA OCULTA
-        async function toggleCreatorMode() {
+        // 5. MODO CRIADOR PROTEGIDO
+        function toggleCreatorMode() {
             const modal = document.getElementById('creatorModal');
             const btn = document.getElementById('btnCreatorToggle');
             const quickBox = document.getElementById('quickUploadBox');
@@ -1277,8 +1264,7 @@
                 const pass = prompt('🔒 Área Restrita do Administrador.\nDigite a sua chave de acesso:');
                 if (pass === null) return;
 
-                const autorizado = await verificarChaveSecreta(pass);
-                if (autorizado) {
+                if (verificarChaveSecreta(pass)) {
                     creatorUnlocked = true;
                     modal.classList.add('open');
                     quickBox.classList.add('unlocked');
