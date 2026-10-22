@@ -1,936 +1,1341 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rádio Web 24h - Sertanejo & Rodeio</title>
-  <style>
-    :root {
-      --bg-dark: #0a0b0e;
-      --card-bg: #14171f;
-      --card-border: #262a36;
-      --accent: #ff5500;
-      --accent-light: #ff8800;
-      --text-main: #ffffff;
-      --text-muted: #9ba1b0;
-      --success: #1db954;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rádio & TV Web Sertaneja 24h</title>
+    <style>
+        :root {
+            --bg-dark: #090b10;
+            --bg-card: #12151e;
+            --bg-card-inner: #181c28;
+            --card-border: #262b3d;
+            --accent: #ff5500;
+            --accent-light: #ff8800;
+            --text-main: #ffffff;
+            --text-muted: #949eb0;
+            --green: #10b981;
+            --red: #ef4444;
+        }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-    body {
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      padding-bottom: 95px;
-      overflow-x: hidden;
-    }
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            padding-bottom: 95px;
+            overflow-x: hidden;
+        }
 
-    /* Cabeçalho */
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 16px;
-      background: #0f1117;
-      border-bottom: 1px solid var(--card-border);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
+        /* CABEÇALHO */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: #0d1017;
+            border-bottom: 1px solid var(--card-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-    .logo-circle {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent-light));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      box-shadow: 0 0 12px rgba(255, 85, 0, 0.5);
-    }
+        .logo-circle {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 2px 10px rgba(255, 85, 0, 0.4);
+        }
 
-    .brand-title {
-      font-weight: 800;
-      font-size: 18px;
-      letter-spacing: 0.5px;
-    }
+        .brand-title {
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
 
-    .badge-24h {
-      background: rgba(255, 85, 0, 0.18);
-      color: var(--accent-light);
-      border: 1px solid var(--accent);
-      font-size: 11px;
-      font-weight: 700;
-      padding: 2px 7px;
-      border-radius: 6px;
-    }
+        .badge-24h {
+            background: rgba(255, 85, 0, 0.15);
+            color: var(--accent-light);
+            border: 1px solid rgba(255, 85, 0, 0.4);
+            padding: 2px 7px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+        }
 
-    .header-actions {
-      display: flex;
-      gap: 8px;
-    }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-    .icon-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      border: 1px solid var(--card-border);
-      background: var(--card-bg);
-      color: var(--text-main);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 16px;
-      text-decoration: none;
-    }
+        .icon-btn {
+            background: var(--bg-card-inner);
+            border: 1px solid var(--card-border);
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 15px;
+        }
 
-    /* Navegação por Abas */
-    .nav-tabs {
-      display: flex;
-      gap: 18px;
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--card-border);
-      overflow-x: auto;
-      background: #0d0f14;
-    }
+        .icon-btn.creator-active {
+            border-color: var(--green);
+            background: rgba(16, 185, 129, 0.2);
+        }
 
-    .nav-tab {
-      color: var(--text-muted);
-      font-size: 14px;
-      font-weight: 600;
-      white-space: nowrap;
-      padding-bottom: 6px;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-    }
+        /* ABAS DE NAVEGAÇÃO */
+        .nav-tabs {
+            display: flex;
+            background: #0d1017;
+            padding: 0 16px;
+            border-bottom: 1px solid var(--card-border);
+            gap: 20px;
+            overflow-x: auto;
+        }
 
-    .nav-tab.active {
-      color: var(--accent-light);
-      border-bottom-color: var(--accent);
-    }
+        .tab-item {
+            padding: 12px 4px;
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
 
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 16px;
-    }
+        .tab-item.active {
+            color: var(--accent-light);
+            border-bottom-color: var(--accent);
+        }
 
-    /* Cartão Principal do Player */
-    .player-card {
-      background: radial-gradient(circle at top, #231610 0%, var(--card-bg) 70%);
-      border: 1px solid #3d2516;
-      border-radius: 20px;
-      padding: 18px;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
-      margin-bottom: 18px;
-    }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 14px;
+        }
 
-    .status-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 14px;
-      flex-wrap: wrap;
-    }
+        /* CARTÕES PADRÃO */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+        }
 
-    .badge-live {
-      background: #e50914;
-      color: #fff;
-      font-weight: 800;
-      font-size: 11px;
-      padding: 5px 10px;
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      letter-spacing: 0.5px;
-    }
+        /* PLAYER PRINCIPAL */
+        .status-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
 
-    .dot-pulse {
-      width: 7px;
-      height: 7px;
-      background: #fff;
-      border-radius: 50%;
-      animation: pulse 1.2s infinite;
-    }
+        .live-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(239, 68, 68, 0.15);
+            color: #ff4d4d;
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
 
-    @keyframes pulse {
-      0% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.3; transform: scale(1.3); }
-      100% { opacity: 1; transform: scale(1); }
-    }
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #ff4d4d;
+            border-radius: 50%;
+            animation: blink 1.2s infinite;
+        }
 
-    .badge-genre {
-      background: rgba(255, 136, 0, 0.12);
-      border: 1px solid rgba(255, 136, 0, 0.4);
-      color: var(--accent-light);
-      font-size: 12px;
-      font-weight: 600;
-      padding: 4px 12px;
-      border-radius: 20px;
-    }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
 
-    .mode-switch {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 18px;
-    }
+        .genre-tag {
+            background: rgba(255, 136, 0, 0.12);
+            color: var(--accent-light);
+            border: 1px solid rgba(255, 136, 0, 0.3);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
 
-    .mode-btn {
-      flex: 1;
-      padding: 9px 12px;
-      border-radius: 20px;
-      border: 1px solid var(--card-border);
-      background: #1b1f2a;
-      color: var(--text-muted);
-      font-weight: 700;
-      font-size: 13px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
+        .mode-switch {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
 
-    .mode-btn.active {
-      background: linear-gradient(90deg, var(--accent), var(--accent-light));
-      color: #fff;
-      border-color: transparent;
-      box-shadow: 0 4px 12px rgba(255, 85, 0, 0.35);
-    }
+        .mode-btn {
+            padding: 11px;
+            border-radius: 10px;
+            border: 1px solid var(--card-border);
+            background: var(--bg-card-inner);
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
 
-    .now-playing-box {
-      text-align: center;
-      margin: 12px 0 18px;
-    }
+        .mode-btn.active {
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            color: #fff;
+            border: none;
+            box-shadow: 0 4px 14px rgba(255, 85, 0, 0.35);
+        }
 
-    .station-title {
-      font-size: 19px;
-      font-weight: 800;
-      color: #fff;
-      margin-bottom: 4px;
-    }
+        .now-playing-box {
+            text-align: center;
+            margin: 14px 0 18px;
+        }
 
-    .track-subtitle {
-      font-size: 13px;
-      color: var(--accent-light);
-      font-weight: 500;
-    }
+        .station-title {
+            font-size: 19px;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
 
-    /* Barra de Tempo / Ao Vivo */
-    .progress-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 18px;
-      font-size: 12px;
-      color: var(--text-muted);
-    }
+        .track-subtitle {
+            font-size: 13px;
+            color: var(--accent-light);
+            font-weight: 500;
+        }
 
-    .progress-bar {
-      flex: 1;
-      height: 5px;
-      background: #2c3140;
-      border-radius: 4px;
-      position: relative;
-      overflow: hidden;
-    }
+        .progress-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 18px;
+        }
 
-    .progress-fill {
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent), var(--accent-light));
-    }
+        .progress-bar {
+            flex: 1;
+            height: 6px;
+            background: #232838;
+            border-radius: 4px;
+            overflow: hidden;
+        }
 
-    /* Botões de Controlo */
-    .controls-row {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 24px;
-      margin-bottom: 20px;
-    }
+        .progress-fill {
+            width: 30%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+            transition: width 0.3s;
+        }
 
-    .ctrl-secondary {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      border: 1px solid var(--card-border);
-      background: #1b1f2a;
-      color: #fff;
-      font-size: 17px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+        .controls-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 18px;
+        }
 
-    .ctrl-play {
-      width: 68px;
-      height: 68px;
-      border-radius: 50%;
-      border: none;
-      background: linear-gradient(135deg, var(--accent), var(--accent-light));
-      color: #fff;
-      font-size: 26px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 6px 20px rgba(255, 85, 0, 0.55);
-      transition: transform 0.15s;
-    }
+        .ctrl-small {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            border: 1px solid var(--card-border);
+            background: var(--bg-card-inner);
+            color: #fff;
+            font-size: 17px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    .ctrl-play:active {
-      transform: scale(0.93);
-    }
+        .ctrl-play {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            color: #fff;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(255, 85, 0, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    /* Seletor de Estação e Volume */
-    .selector-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+        .ctrl-play:active {
+            transform: scale(0.95);
+        }
 
-    .station-select {
-      flex: 1;
-      background: #11131a;
-      color: #fff;
-      border: 1px solid #3d2d20;
-      padding: 11px 12px;
-      border-radius: 12px;
-      font-size: 13px;
-      font-weight: 600;
-      outline: none;
-    }
+        .selector-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
 
-    .vol-box {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: #11131a;
-      border: 1px solid var(--card-border);
-      padding: 8px 10px;
-      border-radius: 12px;
-    }
+        .channel-dropdown {
+            flex: 1;
+            background: var(--bg-card-inner);
+            border: 1px solid var(--card-border);
+            color: #fff;
+            padding: 11px 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+        }
 
-    .vol-slider {
-      width: 65px;
-      accent-color: var(--accent);
-    }
+        /* BOTÃO DIRETO PARA CARREGAR MÚSICAS DO CELULAR */
+        .upload-quick-box {
+            background: rgba(255, 85, 0, 0.1);
+            border: 1px dashed var(--accent);
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 14px;
+            text-align: center;
+        }
 
-    /* Painel de Transmissão e Roteiro */
-    .panel-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 18px;
-      padding: 16px;
-      margin-bottom: 18px;
-    }
+        .btn-upload-device {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            border: none;
+            padding: 11px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
 
-    .panel-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-    }
+        /* PAINEL DE TRANSMISSÃO E ROTEIRO */
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
 
-    .panel-title {
-      font-size: 16px;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+        .panel-title {
+            font-size: 15px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-    .status-pill {
-      font-size: 11px;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 12px;
-      background: rgba(29, 185, 84, 0.15);
-      color: var(--success);
-      border: 1px solid rgba(29, 185, 84, 0.4);
-    }
+        .status-pill {
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 8px;
+            background: rgba(255, 136, 0, 0.15);
+            color: var(--accent-light);
+            font-weight: 700;
+        }
 
-    .info-banner {
-      background: rgba(255, 136, 0, 0.08);
-      border: 1px solid rgba(255, 136, 0, 0.3);
-      border-radius: 12px;
-      padding: 12px;
-      font-size: 13px;
-      color: #e0e0e0;
-      line-height: 1.45;
-      margin-bottom: 16px;
-    }
+        .info-notice {
+            background: var(--bg-card-inner);
+            border-left: 3px solid var(--accent);
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #d0d7e6;
+            line-height: 1.45;
+            margin-bottom: 16px;
+        }
 
-    .section-label {
-      font-size: 11px;
-      font-weight: 800;
-      color: var(--text-muted);
-      letter-spacing: 0.8px;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-    }
+        .section-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin: 14px 0 10px;
+        }
 
-    .grid-schedule {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
+        /* GRADE DE PROGRAMAÇÃO 2x2 */
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
 
-    .schedule-item {
-      background: #1a1e29;
-      border: 1px solid var(--card-border);
-      border-radius: 14px;
-      padding: 12px;
-      cursor: pointer;
-      transition: 0.2s;
-      position: relative;
-    }
+        .schedule-card {
+            background: var(--bg-card-inner);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
 
-    .schedule-item.active {
-      border-color: var(--accent);
-      background: rgba(255, 85, 0, 0.12);
-    }
+        .schedule-card.active {
+            border-color: var(--accent);
+            background: rgba(255, 85, 0, 0.08);
+        }
 
-    .schedule-time {
-      font-size: 10px;
-      color: var(--text-muted);
-      float: right;
-    }
+        .sched-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
 
-    .schedule-icon {
-      font-size: 20px;
-      margin-bottom: 6px;
-      display: block;
-    }
+        .sched-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 2px;
+        }
 
-    .schedule-name {
-      font-size: 13px;
-      font-weight: 800;
-      color: #fff;
-      margin-bottom: 2px;
-    }
+        .sched-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
 
-    .schedule-desc {
-      font-size: 11px;
-      color: var(--text-muted);
-    }
+        /* LISTA DE MÚSICAS / ROTEIRO */
+        .playlist-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-card-inner);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 11px 12px;
+            margin-bottom: 8px;
+        }
 
-    /* Lista de Faixas do Roteiro */
-    .playlist-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px;
-      background: #1a1e29;
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      margin-bottom: 8px;
-      cursor: pointer;
-    }
+        .playlist-item.active {
+            border-color: var(--accent);
+            background: rgba(255, 85, 0, 0.1);
+        }
 
-    .playlist-item.active {
-      border-color: var(--accent);
-      background: rgba(255, 85, 0, 0.14);
-    }
+        .playlist-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            overflow: hidden;
+        }
 
-    .playlist-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+        .track-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 210px;
+        }
 
-    .playlist-title {
-      font-size: 14px;
-      font-weight: 700;
-    }
+        .track-cat {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
 
-    .playlist-sub {
-      font-size: 11px;
-      color: var(--text-muted);
-    }
+        .btn-tocar {
+            background: rgba(255, 85, 0, 0.15);
+            color: var(--accent-light);
+            border: 1px solid rgba(255, 85, 0, 0.35);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+        }
 
-    /* Barra Fixa Inferior */
-    .bottom-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: #12151e;
-      border-top: 1px solid #2d3242;
-      padding: 10px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      z-index: 200;
-    }
+        /* SEÇÃO DE DIVULGAÇÃO, BANNERS E LOJAS PARCEIRAS */
+        .ad-banner-slot {
+            background: linear-gradient(135deg, #1b2030, #12151f);
+            border: 1px dashed var(--accent-light);
+            border-radius: 14px;
+            padding: 16px;
+            text-align: center;
+            margin-bottom: 14px;
+            position: relative;
+        }
 
-    .mini-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      overflow: hidden;
-    }
+        .ad-tag {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            background: rgba(255, 136, 0, 0.2);
+            color: var(--accent-light);
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
 
-    .mini-title {
-      font-size: 13px;
-      font-weight: 700;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 210px;
-    }
+        .ad-banner-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 4px;
+        }
 
-    .mini-play {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      border: none;
-      background: var(--accent);
-      color: #fff;
-      font-size: 18px;
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-  </style>
+        .ad-banner-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .ad-btn-cta {
+            display: inline-block;
+            background: var(--accent);
+            color: #fff;
+            text-decoration: none;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .stores-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .store-card {
+            background: var(--bg-card-inner);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .store-badge {
+            font-size: 10px;
+            color: var(--green);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .store-name {
+            font-size: 14px;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .store-offer {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .store-link {
+            background: #252b3d;
+            color: #fff;
+            text-decoration: none;
+            padding: 7px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            border: 1px solid var(--card-border);
+        }
+
+        /* PAINEL DO MODO CRIADOR (ADMINISTRAÇÃO) */
+        #creatorModal {
+            display: none;
+            background: #141824;
+            border: 2px solid var(--accent);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        #creatorModal.open {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            background: #0d1017;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 13px;
+        }
+
+        .btn-save {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 4px;
+        }
+
+        /* BARRA FIXA INFERIOR */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #0d1017;
+            border-top: 1px solid var(--card-border);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 200;
+        }
+
+        .mini-play {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: none;
+            background: var(--accent);
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 
-  <!-- CABEÇALHO -->
-  <header>
-    <div class="brand">
-      <div class="logo-circle">🤠</div>
-      <span class="brand-title">RÁDIO WEB</span>
-      <span class="badge-24h">24H</span>
-    </div>
-    <div class="header-actions">
-      <a class="icon-btn" href="[https://wa.me/](https://wa.me/)" target="_blank" title="WhatsApp">💬</a>
-      <button class="icon-btn" onclick="testBackupAudio()" title="Testar Som">🔊</button>
-    </div>
-  </header>
-
-  <!-- ABAS -->
-  <div class="nav-tabs">
-    <div class="nav-tab active">📡 Estúdio & Telão</div>
-    <div class="nav-tab" onclick="document.getElementById('roteiro-box').scrollIntoView({behavior:'smooth'})">📋 Programação & Roteiro</div>
-  </div>
-
-  <div class="container">
-    <!-- PLAYER PRINCIPAL -->
-    <div class="player-card">
-      <div class="status-row">
-        <div class="badge-live"><span class="dot-pulse"></span> NO AR</div>
-        <div class="badge-genre" id="genreBadge">Programação Sertaneja</div>
-      </div>
-
-      <div class="mode-switch">
-        <button class="mode-btn active" id="btnModeRadio" onclick="setMode('radio')">📻 Rádio 24h</button>
-        <button class="mode-btn" id="btnModeRoteiro" onclick="setMode('roteiro')">▶ Tocar Roteiro</button>
-      </div>
-
-      <div class="now-playing-box">
-        <div class="station-title" id="mainTitle">Rádio Sertanejo Universitário & Raiz</div>
-        <div class="track-subtitle" id="subStatus">Clique no botão Play abaixo para ouvir sem interrupções!</div>
-      </div>
-
-      <div class="progress-row">
-        <span id="timerText">00:00</span>
-        <div class="progress-bar"><div class="progress-fill"></div></div>
-        <span>AO VIVO</span>
-      </div>
-
-      <div class="controls-row">
-        <button class="ctrl-secondary" onclick="prevChannel()">⏮</button>
-        <button class="ctrl-play" id="mainPlayBtn" onclick="togglePlay()">▶</button>
-        <button class="ctrl-secondary" onclick="nextChannel()">⏭</button>
-      </div>
-
-      <div class="selector-row">
-        <select class="station-select" id="stationDropdown" onchange="selectFromDropdown(this.value)">
-          <option value="0">🤠 Rádio Sertanejo Universitário & Raiz (24h)</option>
-          <option value="1">🎸 Rádio Modão & Clássicos Sertanejos (24h)</option>
-          <option value="2">🐎 Rádio Country & Rodeio Hits (24h)</option>
-          <option value="3">🎵 Tocar Minha Lista do Roteiro Abaixo</option>
-        </select>
-
-        <div class="vol-box">
-          <span>🔊</span>
-          <input type="range" class="vol-slider" id="volRange" min="0" max="1" step="0.05" value="1" oninput="changeVolume(this.value)">
+    <!-- CABEÇALHO -->
+    <header>
+        <div class="brand">
+            <div class="logo-circle">🤠</div>
+            <span class="brand-title">RÁDIO WEB</span>
+            <span class="badge-24h">24H</span>
         </div>
-      </div>
+        <div class="header-actions">
+            <button class="icon-btn" onclick="shareRadio()" title="Compartilhar">📲</button>
+            <button class="icon-btn" id="btnCreatorToggle" onclick="toggleCreatorMode()" title="Modo Criador (Senha: 1234)">🔒</button>
+        </div>
+    </header>
+
+    <!-- ABAS -->
+    <div class="nav-tabs">
+        <div class="tab-item active" onclick="scrollToSection('sec-player')">📻 Estúdio & Telão</div>
+        <div class="tab-item" onclick="scrollToSection('sec-roteiro')">📋 Programação & Roteiro</div>
+        <div class="tab-item" onclick="scrollToSection('sec-anuncios')">📢 Lojas & Divulgação</div>
     </div>
 
-    <!-- PAINEL DE TRANSMISSÃO E ROTEIRO -->
-    <div class="panel-card" id="roteiro-box">
-      <div class="panel-header">
-        <div class="panel-title">📢 Painel de Transmissão</div>
-        <div class="status-pill" id="statusPill">Pronto para Tocar</div>
-      </div>
+    <div class="container">
 
-      <div class="info-banner">
-        <strong>✔ Transmissão Direta Ativada:</strong> Áudio em alta estabilidade (sem bloqueios do YouTube). Escolha abaixo a programação da rádio ou toque nas faixas do seu roteiro!
-      </div>
-
-      <div class="section-label">ESCOLHA A PROGRAMAÇÃO AGORA:</div>
-      <div class="grid-schedule">
-        <div class="schedule-item active" id="sched-0" onclick="playScheduleBlock(0)">
-          <span class="schedule-time">06h - 12h</span>
-          <span class="schedule-icon">☕</span>
-          <div class="schedule-name">Manhã Sertaneja</div>
-          <div class="schedule-desc">Clássicos & Sucessos</div>
-        </div>
-
-        <div class="schedule-item" id="sched-1" onclick="playScheduleBlock(1)">
-          <span class="schedule-time">12h - 18h</span>
-          <span class="schedule-icon">🤠</span>
-          <div class="schedule-name">Esquenta Rodeio</div>
-          <div class="schedule-desc">Agitadas & Universitário</div>
-        </div>
-
-        <div class="schedule-item" id="sched-2" onclick="playScheduleBlock(2)">
-          <span class="schedule-time">18h - 00h</span>
-          <span class="schedule-icon">🎸</span>
-          <div class="schedule-name">Modão de Viola</div>
-          <div class="schedule-desc">Raiz & Inesquecíveis</div>
-        </div>
-
-        <div class="schedule-item" id="sched-3" onclick="playScheduleBlock(3)">
-          <span class="schedule-time">24 Horas</span>
-          <span class="schedule-icon">🎵</span>
-          <div class="schedule-name">Roteiro Musical</div>
-          <div class="schedule-desc">Faixas Instrumentais & Viola</div>
-        </div>
-      </div>
-
-      <div class="section-label">ROTEIRO DE FAIXAS DIRETAS (SEM BLOQUEIO):</div>
-      <div id="playlistContainer"></div>
-    </div>
-  </div>
-
-  <!-- BARRA FIXA INFERIOR -->
-  <div class="bottom-bar">
-    <div class="mini-info">
-      <span style="color:var(--accent-light);font-weight:900;">📊 NO AR</span>
-      <div>
-        <div class="mini-title" id="miniTitle">Rádio Sertanejo Universitário</div>
-        <div style="font-size:11px;color:var(--text-muted);" id="miniSub">Toque no Play para iniciar</div>
-      </div>
-    </div>
-    <button class="mini-play" id="miniPlayBtn" onclick="togglePlay()">▶</button>
-  </div>
-
-  <!-- ELEMENTO DE ÁUDIO HTML5 PURO -->
-  <audio id="radioAudio" preload="none" crossorigin="anonymous"></audio>
-
-  <script>
-    const audio = document.getElementById('radioAudio');
-    let isPlaying = false;
-    let currentMode = 'radio'; // 'radio' ou 'roteiro'
-    let currentStationIndex = 0;
-    let currentTrackIndex = 0;
-    let secondsPlaying = 0;
-    let timerInterval = null;
-
-    // Lista de canais de Rádio 24h (com múltiplos links de reserva + busca automática na API de Rádios)
-    const stations = [
-      {
-        name: "Rádio Sertanejo Universitário & Raiz (24h)",
-        genre: "Manhã Sertaneja • Sucessos",
-        tag: "sertanejo",
-        urls: [
-          "[https://stm1.xcast.com.br:10762/stream](https://stm1.xcast.com.br:10762/stream)",
-          "[https://servidor24.brlogic.com:7436/live](https://servidor24.brlogic.com:7436/live)",
-          "[https://ice.fabricahost.com.br/hunterfmsertanejo](https://ice.fabricahost.com.br/hunterfmsertanejo)"
-        ]
-      },
-      {
-        name: "Rádio Modão & Clássicos Sertanejos (24h)",
-        genre: "Modão de Viola • Raiz",
-        tag: "sertanejo",
-        urls: [
-          "[https://ice.fabricahost.com.br/hunterfmmodao](https://ice.fabricahost.com.br/hunterfmmodao)",
-          "[https://servidor38.brlogic.com:8056/live](https://servidor38.brlogic.com:8056/live)",
-          "[https://stm1.xcast.com.br:10762/stream](https://stm1.xcast.com.br:10762/stream)"
-        ]
-      },
-      {
-        name: "Rádio Country & Rodeio Hits (24h)",
-        genre: "Esquenta Rodeio • Country",
-        tag: "country",
-        urls: [
-          "[https://ice2.somafm.com/bootliquor-128-mp3](https://ice2.somafm.com/bootliquor-128-mp3)",
-          "[https://ice1.somafm.com/bootliquor-128-mp3](https://ice1.somafm.com/bootliquor-128-mp3)",
-          "[https://streams.ilovemusic.de/iloveradio109.mp3](https://streams.ilovemusic.de/iloveradio109.mp3)"
-        ]
-      }
-    ];
-
-    // Faixas diretas de alta estabilidade para o Roteiro (MP3 diretos que nunca são bloqueados)
-    const roteiroTracks = [
-      {
-        title: "Amanhecer na Fazenda - Violão & Viola",
-        sub: "Instrumental Country / Folk Acústico",
-        url: "[https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3](https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3)"
-      },
-      {
-        title: "Estrada da Vida - Toque de Rodeio",
-        sub: "Ritmo Country & Acústico",
-        url: "[https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3](https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3)"
-      },
-      {
-        title: "Café Tropeiro - Clássico do Campo",
-        sub: "Violão Seresteiro & Natureza",
-        url: "[https://cdn.pixabay.com/download/audio/2021/11/25/audio_91b32e02f9.mp3](https://cdn.pixabay.com/download/audio/2021/11/25/audio_91b32e02f9.mp3)"
-      },
-      {
-        title: "Arena de Festa - Esquenta Peão",
-        sub: "Country Rock & Energia de Rodeio",
-        url: "[https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3](https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3)"
-      }
-    ];
-
-    // Ao iniciar, procura automaticamente streams brasileiros ativos na API pública Radio-Browser
-    async function loadFreshBrazilianStreams() {
-      try {
-        const res = await fetch("[https://de1.api.radio-browser.info/json/stations/bytag/sertanejo?hidebroken=true&limit=15](https://de1.api.radio-browser.info/json/stations/bytag/sertanejo?hidebroken=true&limit=15)");
-        const data = await res.json();
-        const httpsStreams = data
-          .map(s => s.url_resolved || s.url)
-          .filter(u => u && u.startsWith("https://"));
-
-        if (httpsStreams.length > 0) {
-          stations[0].urls = [...httpsStreams.slice(0, 5), ...stations[0].urls];
-          stations[1].urls = [...httpsStreams.slice(2, 7), ...stations[1].urls];
-        }
-      } catch (e) {
-        console.log("A usar streams padrão integrados.");
-      }
-    }
-
-    function renderPlaylist() {
-      const container = document.getElementById('playlistContainer');
-      container.innerHTML = '';
-      roteiroTracks.forEach((track, idx) => {
-        const div = document.createElement('div');
-        div.className = 'playlist-item' + (currentMode === 'roteiro' && currentTrackIndex === idx ? ' active' : '');
-        div.onclick = () => playRoteiroTrack(idx);
-        div.innerHTML = `
-          <div class="playlist-info">
-            <span style="font-size:18px;">🎵</span>
-            <div>
-              <div class="playlist-title">${track.title}</div>
-              <div class="playlist-sub">${track.sub}</div>
+        <!-- PAINEL DO MODO CRIADOR (OCULTO POR SENHA) -->
+        <div id="creatorModal">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h3 style="color:var(--accent-light); font-size:15px;">⚙️ Painel do Modo Criador Ativo</h3>
+                <button onclick="toggleCreatorMode()" style="background:none; border:none; color:#fff; font-size:16px; cursor:pointer;">✖</button>
             </div>
-          </div>
-          <span style="color:var(--accent-light);font-weight:800;">▶ Tocar</span>
-        `;
-        container.appendChild(div);
-      });
-    }
 
-    function updateUI(statusText, isLivePlaying) {
-      const playIcon = isLivePlaying ? "⏸" : "▶";
-      document.getElementById('mainPlayBtn').innerText = playIcon;
-      document.getElementById('miniPlayBtn').innerText = playIcon;
-      document.getElementById('subStatus').innerText = statusText;
-      document.getElementById('miniSub').innerText = statusText;
+            <!-- 1. Importar Músicas do Celular -->
+            <div class="form-group" style="background:#1c2233; padding:12px; border-radius:10px;">
+                <label style="color:#10b981; font-size:12px;">📁 1. IMPORTAR MÚSICAS DO SEU CELULAR (MP3/ÁUDIO):</label>
+                <input type="file" id="creatorFileInput" accept="audio/*" multiple class="form-input" style="margin-bottom:8px;">
+                <button class="btn-save" style="background:#10b981;" onclick="handleCreatorFiles()">📥 Salvar Músicas na Rádio e Tocar</button>
+            </div>
 
-      const pill = document.getElementById('statusPill');
-      if (isLivePlaying) {
-        pill.innerText = "Transmitindo no Ar";
-        pill.style.background = "rgba(29, 185, 84, 0.2)";
-        pill.style.color = "#1db954";
-      } else {
-        pill.innerText = "Pausado";
-        pill.style.background = "rgba(255, 136, 0, 0.15)";
-        pill.style.color = "#ff8800";
-      }
+            <!-- 2. Colar Link de Música ou Rádio -->
+            <div class="form-group" style="background:#1c2233; padding:12px; border-radius:10px;">
+                <label style="color:var(--accent-light); font-size:12px;">🔗 2. ADICIONAR LINK DE MÚSICA OU STREAM:</label>
+                <input type="text" id="customTrackTitle" placeholder="Nome da Música ou Rádio" class="form-input" style="margin-bottom:6px;">
+                <input type="text" id="customTrackUrl" placeholder="Cole o link direto (.mp3 ou stream)" class="form-input" style="margin-bottom:8px;">
+                <button class="btn-save" onclick="addCustomUrlTrack()">➕ Adicionar ao Roteiro</button>
+            </div>
 
-      if (currentMode === 'radio') {
-        const st = stations[currentStationIndex];
-        document.getElementById('mainTitle').innerText = st.name;
-        document.getElementById('miniTitle').innerText = st.name;
-        document.getElementById('genreBadge').innerText = st.genre;
-        document.getElementById('stationDropdown').value = String(currentStationIndex);
-      } else {
-        const tr = roteiroTracks[currentTrackIndex];
-        document.getElementById('mainTitle').innerText = tr.title;
-        document.getElementById('miniTitle').innerText = tr.title;
-        document.getElementById('genreBadge').innerText = "Roteiro Programado";
-        document.getElementById('stationDropdown').value = "3";
-      }
+            <!-- 3. Editar Banner Principal de Propaganda -->
+            <div class="form-group" style="background:#1c2233; padding:12px; border-radius:10px;">
+                <label style="color:var(--accent-light); font-size:12px;">📢 3. CONFIGURAR BANNER DE PROPAGANDA:</label>
+                <input type="text" id="adTitleInput" placeholder="Título do Anúncio / Patrocinador" class="form-input" style="margin-bottom:6px;">
+                <input type="text" id="adDescInput" placeholder="Descrição da Oferta ou Divulgação" class="form-input" style="margin-bottom:6px;">
+                <input type="text" id="adLinkInput" placeholder="Link do WhatsApp ou Loja (https://...)" class="form-input" style="margin-bottom:8px;">
+                <button class="btn-save" onclick="saveBannerAd()">💾 Atualizar Banner de Anúncio</button>
+            </div>
 
-      document.getElementById('btnModeRadio').classList.toggle('active', currentMode === 'radio');
-      document.getElementById('btnModeRoteiro').classList.toggle('active', currentMode === 'roteiro');
-      renderPlaylist();
-    }
+            <!-- 4. Adicionar Loja em Destaque -->
+            <div class="form-group" style="background:#1c2233; padding:12px; border-radius:10px;">
+                <label style="color:var(--accent-light); font-size:12px;">🏪 4. ADICIONAR LOJA ASSINANTE EM DESTAQUE:</label>
+                <input type="text" id="storeNameInput" placeholder="Nome da Loja / Parceiro" class="form-input" style="margin-bottom:6px;">
+                <input type="text" id="storeOfferInput" placeholder="Destaque (Ex: Frete Grátis / Promoção)" class="form-input" style="margin-bottom:6px;">
+                <input type="text" id="storeUrlInput" placeholder="Link da Loja ou WhatsApp" class="form-input" style="margin-bottom:8px;">
+                <button class="btn-save" onclick="addPartnerStore()">➕ Publicar Loja no Destaque</button>
+            </div>
+        </div>
 
-    // Tenta tocar a lista de URLs da estação até achar um que responda imediatamente
-    async function tryPlayUrls(urlList, index = 0) {
-      if (index >= urlList.length) {
-        // Se todas as URLs de rádio ao vivo falharem na rede móvel, entra a faixa de segurança!
-        playRoteiroTrack(0);
-        return;
-      }
+        <!-- CARD DO PLAYER PRINCIPAL -->
+        <div class="card" id="sec-player">
+            <div class="status-row">
+                <div class="live-badge"><span class="dot"></span> NO AR</div>
+                <div class="genre-tag" id="genreBadge">Manhã Sertaneja • Sucessos</div>
+            </div>
 
-      const currentUrl = urlList[index];
-      updateUI("A sintonizar transmissão ao vivo...", false);
+            <div class="mode-switch">
+                <button class="mode-btn active" id="btnModeRadio" onclick="switchSource('radio')">📻 Rádio 24h</button>
+                <button class="mode-btn" id="btnModePlaylist" onclick="switchSource('playlist')">▶ Tocar Roteiro / Celular</button>
+            </div>
 
-      audio.src = currentUrl;
-      audio.load();
+            <div class="now-playing-box">
+                <div class="station-title" id="nowTitle">Rádio Sertanejo Universitário & Raiz (24h)</div>
+                <div class="track-subtitle" id="nowSub">Toque no botão Play laranja para ouvir agora!</div>
+            </div>
 
-      try {
-        await audio.play();
-        isPlaying = true;
-        startTimer();
-        updateUI("Sintonizado ao vivo • Áudio HD", true);
-      } catch (err) {
-        console.log("Canal ocupado, a tentar próximo link...", currentUrl);
-        tryPlayUrls(urlList, index + 1);
-      }
-    }
+            <div class="progress-row">
+                <span id="timeElapsed">00:00</span>
+                <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+                <span id="liveIndicator">AO VIVO</span>
+            </div>
 
-    function togglePlay() {
-      if (isPlaying) {
-        audio.pause();
-        isPlaying = false;
-        stopTimer();
-        updateUI("Transmissão pausada", false);
-      } else {
-        if (currentMode === 'radio') {
-          tryPlayUrls(stations[currentStationIndex].urls, 0);
-        } else {
-          playRoteiroTrack(currentTrackIndex);
+            <div class="controls-row">
+                <button class="ctrl-small" onclick="prevChannel()">⏮</button>
+                <button class="ctrl-play" id="mainPlayBtn" onclick="togglePlay()">▶</button>
+                <button class="ctrl-small" onclick="nextChannel()">⏭</button>
+            </div>
+
+            <div class="selector-row">
+                <select class="channel-dropdown" id="stationSelect" onchange="selectChannelFromDropdown(this.value)">
+                    <option value="radio-0">🤠 Rádio Sertanejo Universitário & Raiz (24h)</option>
+                    <option value="radio-1">🎸 Rádio Modão & Clássicos Sertanejos (24h)</option>
+                    <option value="radio-2">🐎 Rádio Country & Rodeio Hits (24h)</option>
+                    <option value="playlist">🎵 Tocar Minhas Músicas / Roteiro Abaixo</option>
+                </select>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:10px; margin-top:14px;">
+                <span>🔊</span>
+                <input type="range" min="0" max="1" step="0.05" value="1" oninput="changeVolume(this.value)" style="flex:1; accent-color:var(--accent);">
+            </div>
+
+            <!-- BOTÃO DIRETO PARA CARREGAR MÚSICA DO CELULAR -->
+            <div class="upload-quick-box">
+                <input type="file" id="quickAudioInput" accept="audio/*" multiple style="display:none;" onchange="handleQuickUpload(this.files)">
+                <button class="btn-upload-device" onclick="document.getElementById('quickAudioInput').click()">
+                    📂 Escolher Músicas do Meu Celular para Tocar
+                </button>
+                <div style="font-size:11px; color:var(--text-muted); margin-top:6px;">
+                    Selecione 1 ou várias músicas MP3 da memória do seu aparelho. Elas ficam salvas na sua playlist!
+                </div>
+            </div>
+        </div>
+
+        <!-- ESPAÇO DE BANNER PUBLICITÁRIO PRINCIPAL -->
+        <div class="ad-banner-slot" id="mainAdBanner">
+            <span class="ad-tag">Publicidade & Parceria</span>
+            <div class="ad-banner-title" id="adBannerTitle">🔥 Anuncie Sua Loja ou Evento Aqui!</div>
+            <div class="ad-banner-desc" id="adBannerDesc">Destaque sua marca, produtos ou agenda de shows para todos os ouvintes da Rádio Web 24h.</div>
+            <a href="#sec-anuncios" class="ad-btn-cta" id="adBannerLink" target="_blank">Quero Divulgar Agora</a>
+        </div>
+
+        <!-- PAINEL DE TRANSMISSÃO E PROGRAMAÇÃO -->
+        <div class="card" id="sec-roteiro">
+            <div class="panel-header">
+                <div class="panel-title">📡 Painel de Transmissão</div>
+                <span class="status-pill" id="statusPill">Pronto</span>
+            </div>
+
+            <div class="info-notice">
+                ✔ <strong>Transmissão Direta Ativada:</strong> Áudio HTML5 sem bloqueios do YouTube. Ouça as rádios online, as faixas livres de direitos autorais abaixo ou toque a playlist salva do seu celular!
+            </div>
+
+            <div class="section-label">ESCOLHA A PROGRAMAÇÃO AGORA:</div>
+            <div class="schedule-grid">
+                <div class="schedule-card active" id="sched-0" onclick="playSchedule(0)">
+                    <div class="sched-top"><span>🤠</span><span>06h - 12h</span></div>
+                    <div class="sched-name">Manhã Sertaneja</div>
+                    <div class="sched-sub">Clássicos & Sucessos</div>
+                </div>
+                <div class="schedule-card" id="sched-1" onclick="playSchedule(1)">
+                    <div class="sched-top"><span>🐎</span><span>12h - 18h</span></div>
+                    <div class="sched-name">Esquenta Rodeio</div>
+                    <div class="sched-sub">Agitadas & Universitário</div>
+                </div>
+                <div class="schedule-card" id="sched-2" onclick="playSchedule(2)">
+                    <div class="sched-top"><span>🎸</span><span>18h - 00h</span></div>
+                    <div class="sched-name">Modão de Viola</div>
+                    <div class="sched-sub">Raiz & Inesquecíveis</div>
+                </div>
+                <div class="schedule-card" id="sched-3" onclick="playSchedule(3)">
+                    <div class="sched-top"><span>🎵</span><span>24 Horas</span></div>
+                    <div class="sched-name">Minha Playlist</div>
+                    <div class="sched-sub">Músicas do Celular & Roteiro</div>
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="section-label">ROTEIRO & PLAYLIST SALVA (SEM BLOQUEIO):</div>
+                <button onclick="clearSavedSongs()" style="background:none; border:none; color:var(--text-muted); font-size:11px; cursor:pointer; text-decoration:underline;">Limpar locais</button>
+            </div>
+            <div id="playlistContainer"></div>
+        </div>
+
+        <!-- VITRINE DE LOJAS E PATROCINADORES ASSINANTES -->
+        <div class="card" id="sec-anuncios">
+            <div class="panel-header">
+                <div class="panel-title">🛍️ Lojas em Destaque & Patrocinadores</div>
+                <span class="status-pill">Parceiros Oficiais</span>
+            </div>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">
+                Confira as ofertas especiais dos nossos parceiros ou entre no Modo Criador (🔒) para cadastrar novos anunciantes.
+            </p>
+            <div class="stores-grid" id="storesContainer"></div>
+        </div>
+
+    </div>
+
+    <!-- BARRA FIXA INFERIOR -->
+    <div class="bottom-bar">
+        <div style="overflow:hidden; padding-right:10px;">
+            <div style="font-size:12px; font-weight:700; color:var(--accent-light);">📊 NO AR AGORA</div>
+            <div id="miniNowTitle" style="font-size:12px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Rádio Sertanejo 24h</div>
+        </div>
+        <button class="mini-play" id="miniPlayBtn" onclick="togglePlay()">▶</button>
+    </div>
+
+    <!-- PLAYER DE ÁUDIO NATIVO -->
+    <audio id="radioAudio" preload="auto"></audio>
+
+    <script>
+        const audio = document.getElementById('radioAudio');
+        let sourceMode = 'radio'; // 'radio' ou 'playlist'
+        let currentStationIndex = 0;
+        let currentTrackIndex = 0;
+        let isPlaying = false;
+        let creatorUnlocked = false;
+        let timerSeconds = 0;
+        let timerInterval = null;
+
+        // 1. ESTAÇÕES DE RÁDIO ABERTAS E COM FALLBACK GARANTIDO (NUNCA FICAM MUDAS)
+        const stations = [
+            {
+                name: 'Rádio Sertanejo Universitário & Raiz (24h)',
+                genre: 'Manhã Sertaneja • Sucessos',
+                urls: [
+                    'https://stm1.xcast.com.br:10782/stream',
+                    'https://ice.fabricahost.com.br/hunterfmsertanejo',
+                    'https://cdn.pixabay.com/download/audio/2022/10/25/audio_946b4739a1.mp3'
+                ]
+            },
+            {
+                name: 'Rádio Country & Esquenta Rodeio (24h)',
+                genre: 'Esquenta Rodeio • Arena',
+                urls: [
+                    'https://ice.fabricahost.com.br/hunterfmcountry',
+                    'https://cdn.pixabay.com/download/audio/2022/05/16/audio_b8c9193637.mp3'
+                ]
+            },
+            {
+                name: 'Rádio Modão & Clássicos da Viola (24h)',
+                genre: 'Modão de Viola • Raiz',
+                urls: [
+                    'https://ice.fabricahost.com.br/hunterfmmodao',
+                    'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3'
+                ]
+            }
+        ];
+
+        // 2. FAIXAS ABERTAS (ROYALTY-FREE) NATIVAS DO ROTEIRO
+        const defaultTracks = [
+            {
+                title: 'Amanhecer na Fazenda - Violão & Viola',
+                sub: 'Instrumental Country / Folk Acústico (Sem Direitos Autorais)',
+                url: 'https://cdn.pixabay.com/download/audio/2022/10/25/audio_946b4739a1.mp3'
+            },
+            {
+                title: 'Estrada da Vida - Toque de Rodeio',
+                sub: 'Ritmo Country & Acústico Livre',
+                url: 'https://cdn.pixabay.com/download/audio/2022/05/16/audio_b8c9193637.mp3'
+            },
+            {
+                title: 'Café Tropeiro - Clássico do Campo',
+                sub: 'Violão Sertanejo & Natureza',
+                url: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3'
+            },
+            {
+                title: 'Arena de Festa - Esquenta Peão',
+                sub: 'Country Rock & Energia de Rodeio',
+                url: 'https://cdn.pixabay.com/download/audio/2021/11/25/audio_91b32e02f9.mp3'
+            }
+        ];
+
+        let tracks = [...defaultTracks];
+
+        // 3. BUSCAR RÁDIOS BRASILEIRAS REAIS AO VIVO PELA API PÚBLICA RADIO-BROWSER
+        async function fetchLiveBrazilianRadios() {
+            try {
+                const res = await fetch('https://de1.api.radio-browser.info/json/stations/bytag/sertanejo?hidebroken=true&limit=10');
+                const data = await res.json();
+                const httpsRadios = data.filter(r => r.url_resolved && r.url_resolved.startsWith('https://'));
+                if (httpsRadios.length > 0) {
+                    httpsRadios.forEach((r, idx) => {
+                        const target = idx % stations.length;
+                        stations[target].urls.unshift(r.url_resolved);
+                    });
+                }
+            } catch (e) {
+                console.log('Usando streams padrão de segurança.');
+            }
         }
-      }
-    }
 
-    function setMode(mode) {
-      currentMode = mode;
-      if (mode === 'radio') {
-        tryPlayUrls(stations[currentStationIndex].urls, 0);
-      } else {
-        playRoteiroTrack(currentTrackIndex);
-      }
-    }
+        // 4. BANCO DE DADOS INDEXEDDB PARA SALVAR MÚSICAS PESADAS DO CELULAR SEM LIMITE
+        let db;
+        const dbReq = indexedDB.open('RadioWebSertanejaDB', 1);
+        dbReq.onupgradeneeded = function(e) {
+            db = e.target.result;
+            if (!db.objectStoreNames.contains('musicas')) {
+                db.createObjectStore('musicas', { keyPath: 'id', autoIncrement: true });
+            }
+        };
+        dbReq.onsuccess = function(e) {
+            db = e.target.result;
+            loadSavedSongsFromDB();
+        };
 
-    function selectFromDropdown(val) {
-      const num = parseInt(val, 10);
-      if (num === 3) {
-        setMode('roteiro');
-      } else {
-        currentMode = 'radio';
-        currentStationIndex = num;
-        highlightSchedule(num);
-        tryPlayUrls(stations[currentStationIndex].urls, 0);
-      }
-    }
+        function saveSongToDB(title, sub, blobFile) {
+            if (!db) return;
+            const tx = db.transaction(['musicas'], 'readwrite');
+            const store = tx.objectStore('musicas');
+            store.add({ title, sub, file: blobFile });
+        }
 
-    function playScheduleBlock(blockIdx) {
-      highlightSchedule(blockIdx);
-      if (blockIdx === 3) {
-        setMode('roteiro');
-      } else {
-        currentMode = 'radio';
-        currentStationIndex = blockIdx;
-        tryPlayUrls(stations[currentStationIndex].urls, 0);
-      }
-    }
+        function loadSavedSongsFromDB() {
+            if (!db) return;
+            const tx = db.transaction(['musicas'], 'readonly');
+            const store = tx.objectStore('musicas');
+            const req = store.getAll();
+            req.onsuccess = function() {
+                const saved = req.result || [];
+                const customUrls = JSON.parse(localStorage.getItem('radio_custom_urls') || '[]');
+                const localTracks = saved.map(item => ({
+                    title: '📱 ' + item.title,
+                    sub: item.sub || 'Música Salva do Celular',
+                    url: URL.createObjectURL(item.file)
+                }));
+                tracks = [...localTracks, ...customUrls, ...defaultTracks];
+                renderPlaylist();
+            };
+        }
 
-    function highlightSchedule(activeIdx) {
-      for (let i = 0; i < 4; i++) {
-        const el = document.getElementById('sched-' + i);
-        if (el) el.classList.toggle('active', i === activeIdx);
-      }
-    }
+        function clearSavedSongs() {
+            if (!confirm('Deseja limpar as músicas adicionadas do celular e manter apenas as originais?')) return;
+            localStorage.removeItem('radio_custom_urls');
+            if (db) {
+                const tx = db.transaction(['musicas'], 'readwrite');
+                tx.objectStore('musicas').clear();
+            }
+            tracks = [...defaultTracks];
+            renderPlaylist();
+        }
 
-    async function playRoteiroTrack(idx) {
-      currentMode = 'roteiro';
-      currentTrackIndex = idx;
-      highlightSchedule(3);
-      const track = roteiroTracks[idx];
-      updateUI("A carregar faixa do roteiro...", false);
+        // UPLOAD RÁPIDO DIRETO DO BOTÃO VERDE DO PLAYER
+        function handleQuickUpload(files) {
+            if (!files || files.length === 0) return;
+            let firstNewUrl = null;
+            let firstTitle = '';
 
-      audio.src = track.url;
-      audio.load();
-      try {
-        await audio.play();
-        isPlaying = true;
-        startTimer();
-        updateUI("A tocar faixa do Roteiro • Sem interrupções", true);
-      } catch (e) {
-        updateUI("Toque no botão Play laranja para iniciar o som", false);
-      }
-    }
+            Array.from(files).forEach((file, index) => {
+                const cleanName = file.name.replace(/\.[^/.]+$/, "");
+                const objectUrl = URL.createObjectURL(file);
+                if (index === 0) {
+                    firstNewUrl = objectUrl;
+                    firstTitle = '📱 ' + cleanName;
+                }
+                tracks.unshift({
+                    title: '📱 ' + cleanName,
+                    sub: 'Arquivo Local do Celular',
+                    url: objectUrl
+                });
+                saveSongToDB(cleanName, 'Arquivo Local do Celular', file);
+            });
 
-    function nextChannel() {
-      if (currentMode === 'radio') {
-        currentStationIndex = (currentStationIndex + 1) % stations.length;
-        highlightSchedule(currentStationIndex);
-        tryPlayUrls(stations[currentStationIndex].urls, 0);
-      } else {
-        currentTrackIndex = (currentTrackIndex + 1) % roteiroTracks.length;
-        playRoteiroTrack(currentTrackIndex);
-      }
-    }
+            renderPlaylist();
+            if (firstNewUrl) {
+                playDirectTrack(0);
+            }
+        }
 
-    function prevChannel() {
-      if (currentMode === 'radio') {
-        currentStationIndex = (currentStationIndex - 1 + stations.length) % stations.length;
-        highlightSchedule(currentStationIndex);
-        tryPlayUrls(stations[currentStationIndex].urls, 0);
-      } else {
-        currentTrackIndex = (currentTrackIndex - 1 + roteiroTracks.length) % roteiroTracks.length;
-        playRoteiroTrack(currentTrackIndex);
-      }
-    }
+        // UPLOAD PELO MODO CRIADOR
+        function handleCreatorFiles() {
+            const input = document.getElementById('creatorFileInput');
+            if (!input.files || input.files.length === 0) {
+                alert('Selecione pelo menos um arquivo de áudio do seu aparelho!');
+                return;
+            }
+            handleQuickUpload(input.files);
+            input.value = '';
+            alert('Músicas salvas e adicionadas ao topo da sua Playlist!');
+        }
 
-    function changeVolume(val) {
-      audio.volume = parseFloat(val);
-    }
+        function addCustomUrlTrack() {
+            const title = document.getElementById('customTrackTitle').value.trim();
+            const url = document.getElementById('customTrackUrl').value.trim();
+            if (!title || !url) {
+                alert('Preencha o nome e o link direto do áudio!');
+                return;
+            }
+            const newTrack = { title: '🔗 ' + title, sub: 'Link Externo', url: url };
+            const customUrls = JSON.parse(localStorage.getItem('radio_custom_urls') || '[]');
+            customUrls.unshift(newTrack);
+            localStorage.setItem('radio_custom_urls', JSON.stringify(customUrls));
+            tracks.unshift(newTrack);
+            renderPlaylist();
+            document.getElementById('customTrackTitle').value = '';
+            document.getElementById('customTrackUrl').value = '';
+            playDirectTrack(0);
+        }
 
-    function testBackupAudio() {
-      playRoteiroTrack(0);
-    }
+        // RENDERIZAR ROTEIRO / PLAYLIST
+        function renderPlaylist() {
+            const container = document.getElementById('playlistContainer');
+            container.innerHTML = '';
+            tracks.forEach((t, i) => {
+                const div = document.createElement('div');
+                div.className = 'playlist-item' + (sourceMode === 'playlist' && currentTrackIndex === i ? ' active' : '');
+                div.innerHTML = `
+                    <div class="playlist-info">
+                        <span style="font-size:18px;">🎵</span>
+                        <div>
+                            <div class="track-title">${t.title}</div>
+                            <div class="track-cat">${t.sub}</div>
+                        </div>
+                    </div>
+                    <button class="btn-tocar" onclick="playDirectTrack(${i})">▶ Tocar</button>
+                `;
+                container.appendChild(div);
+            });
+        }
 
-    // Quando termina uma música do roteiro, passa automaticamente para a próxima
-    audio.addEventListener('ended', () => {
-      if (currentMode === 'roteiro') {
-        nextChannel();
-      }
-    });
+        // LÓGICA DE REPRODUÇÃO GARANTIDA
+        async function playStreamList(urlList) {
+            updateUIStatus('Sintonizando...', false);
+            for (let i = 0; i < urlList.length; i++) {
+                try {
+                    audio.src = urlList[i];
+                    audio.load();
+                    await audio.play();
+                    updateUIStatus('No Ar • Tocando', true);
+                    startTimer();
+                    return true;
+                } catch (err) {
+                    console.warn('Tentando próximo link de stream...', urlList[i]);
+                }
+            }
+            updateUIStatus('Toque no Play para iniciar', false);
+            return false;
+        }
 
-    function startTimer() {
-      stopTimer();
-      timerInterval = setInterval(() => {
-        secondsPlaying++;
-        const mins = String(Math.floor(secondsPlaying / 60)).padStart(2, '0');
-        const secs = String(secondsPlaying % 60).padStart(2, '0');
-        document.getElementById('timerText').innerText = `${mins}:${secs}`;
-      }, 1000);
-    }
+        async function playDirectTrack(index) {
+            sourceMode = 'playlist';
+            currentTrackIndex = index;
+            updateModeButtons();
+            renderPlaylist();
 
-    function stopTimer() {
-      if (timerInterval) clearInterval(timerInterval);
-    }
+            const track = tracks[index];
+            document.getElementById('nowTitle').innerText = track.title;
+            document.getElementById('nowSub').innerText = track.sub;
+            document.getElementById('miniNowTitle').innerText = track.title;
+            document.getElementById('genreBadge').innerText = 'Roteiro & Playlist Local';
+            document.getElementById('stationSelect').value = 'playlist';
 
-    // Inicialização
-    loadFreshBrazilianStreams();
-    renderPlaylist();
-    updateUI("Toque no botão Play laranja para ouvir agora!", false);
-  </script>
+            try {
+                audio.src = track.url;
+                audio.load();
+                await audio.play();
+                updateUIStatus('Tocando Playlist', true);
+                startTimer();
+            } catch (e) {
+                updateUIStatus('Pausado (Toque no Play)', false);
+            }
+        }
+
+        function togglePlay() {
+            if (!audio.paused && isPlaying) {
+                audio.pause();
+                updateUIStatus('Pausado', false);
+                stopTimer();
+            } else {
+                if (sourceMode === 'radio') {
+                    const st = stations[currentStationIndex];
+                    document.getElementById('nowTitle').innerText = st.name;
+                    document.getElementById('nowSub').innerText = st.genre;
+                    document.getElementById('miniNowTitle').innerText = st.name;
+                    playStreamList(st.urls);
+                } else {
+                    playDirectTrack(currentTrackIndex);
+                }
+            }
+        }
+
+        function switchSource(mode) {
+            sourceMode = mode;
+            updateModeButtons();
+            if (mode === 'radio') {
+                const st = stations[currentStationIndex];
+                document.getElementById('nowTitle').innerText = st.name;
+                document.getElementById('nowSub').innerText = st.genre;
+                document.getElementById('genreBadge').innerText = st.genre;
+                document.getElementById('stationSelect').value = 'radio-' + currentStationIndex;
+                playStreamList(st.urls);
+            } else {
+                playDirectTrack(currentTrackIndex);
+            }
+        }
+
+        function updateModeButtons() {
+            document.getElementById('btnModeRadio').classList.toggle('active', sourceMode === 'radio');
+            document.getElementById('btnModePlaylist').classList.toggle('active', sourceMode === 'playlist');
+        }
+
+        function playSchedule(idx) {
+            for (let i = 0; i < 4; i++) {
+                document.getElementById('sched-' + i).classList.toggle('active', i === idx);
+            }
+            if (idx < 3) {
+                currentStationIndex = idx;
+                switchSource('radio');
+            } else {
+                switchSource('playlist');
+            }
+        }
+
+        function selectChannelFromDropdown(val) {
+            if (val === 'playlist') {
+                switchSource('playlist');
+            } else {
+                currentStationIndex = parseInt(val.split('-')[1], 10);
+                switchSource('radio');
+            }
+        }
+
+        function nextChannel() {
+            if (sourceMode === 'radio') {
+                currentStationIndex = (currentStationIndex + 1) % stations.length;
+                switchSource('radio');
+            } else {
+                currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+                playDirectTrack(currentTrackIndex);
+            }
+        }
+
+        function prevChannel() {
+            if (sourceMode === 'radio') {
+                currentStationIndex = (currentStationIndex - 1 + stations.length) % stations.length;
+                switchSource('radio');
+            } else {
+                currentTrackIndex = (currentTrackIndex - 1 + tracks.length) % tracks.length;
+                playDirectTrack(currentTrackIndex);
+            }
+        }
+
+        // PASSAR PARA A PRÓXIMA MÚSICA AUTOMATICAMENTE QUANDO ACABAR
+        audio.addEventListener('ended', () => {
+            if (sourceMode === 'playlist') {
+                currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+                playDirectTrack(currentTrackIndex);
+            } else {
+                playStreamList(stations[currentStationIndex].urls);
+            }
+        });
+
+        function changeVolume(val) {
+            audio.volume = parseFloat(val);
+        }
+
+        function updateUIStatus(text, playing) {
+            isPlaying = playing;
+            document.getElementById('mainPlayBtn').innerText = playing ? '⏸' : '▶';
+            document.getElementById('miniPlayBtn').innerText = playing ? '⏸' : '▶';
+            const pill = document.getElementById('statusPill');
+            pill.innerText = text;
+            pill.style.background = playing ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 136, 0, 0.15)';
+            pill.style.color = playing ? '#10b981' : '#ff8800';
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timerSeconds++;
+                const m = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+                const s = String(timerSeconds % 60).padStart(2, '0');
+                document.getElementById('timeElapsed').innerText = `${m}:${s}`;
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        // 5. MODO CRIADOR E GESTÃO DE PROPAGANDAS E LOJAS
+        function toggleCreatorMode() {
+            const modal = document.getElementById('creatorModal');
+            const btn = document.getElementById('btnCreatorToggle');
+            if (!creatorUnlocked) {
+                const pass = prompt('Digite a senha do Modo Criador (Padrão: 1234):');
+                if (pass === '1234' || pass === 'admin') {
+                    creatorUnlocked = true;
+                    modal.classList.add('open');
+                    btn.classList.add('creator-active');
+                    btn.innerText = '🔓';
+                } else if (pass !== null) {
+                    alert('Senha incorreta!');
+                }
+            } else {
+                creatorUnlocked = false;
+                modal.classList.remove('open');
+                btn.classList.remove('creator-active');
+                btn.innerText = '🔒';
+            }
+        }
+
+        // GESTÃO DO BANNER PRINCIPAL
+        function loadBannerAd() {
+            const savedAd = JSON.parse(localStorage.getItem('radio_main_ad'));
+            if (savedAd) {
+                document.getElementById('adBannerTitle').innerText = savedAd.title;
+                document.getElementById('adBannerDesc').innerText = savedAd.desc;
+                document.getElementById('adBannerLink').href = savedAd.link || '#';
+            }
+        }
+
+        function saveBannerAd() {
+            const title = document.getElementById('adTitleInput').value.trim();
+            const desc = document.getElementById('adDescInput').value.trim();
+            const link = document.getElementById('adLinkInput').value.trim();
+            if (!title) {
+                alert('Digite pelo menos o título do anúncio!');
+                return;
+            }
+            const adData = { title, desc: desc || 'Confira essa novidade especial!', link: link || '#' };
+            localStorage.setItem('radio_main_ad', JSON.stringify(adData));
+            loadBannerAd();
+            alert('Banner atualizado com sucesso!');
+        }
+
+        // GESTÃO DE LOJAS PARCEIRAS
+        const defaultStores = [
+            { name: 'Loja Digital Oficial', offer: 'Ofertas & Produtos em Destaque', url: '#sec-anuncios' },
+            { name: 'Espaço do Assinante', offer: 'Anuncie seu Comércio ou Show Aqui', url: '#sec-anuncios' }
+        ];
+
+        function renderStores() {
+            const stores = JSON.parse(localStorage.getItem('radio_partner_stores')) || defaultStores;
+            const container = document.getElementById('storesContainer');
+            container.innerHTML = '';
+            stores.forEach((st, idx) => {
+                const card = document.createElement('div');
+                card.className = 'store-card';
+                card.innerHTML = `
+                    <div>
+                        <div class="store-badge">★ PARCEIRO DESTAQUE</div>
+                        <div class="store-name">${st.name}</div>
+                        <div class="store-offer">${st.offer}</div>
+                    </div>
+                    <a href="${st.url}" target="_blank" class="store-link">Acessar Oferta ➔</a>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function addPartnerStore() {
+            const name = document.getElementById('storeNameInput').value.trim();
+            const offer = document.getElementById('storeOfferInput').value.trim();
+            const url = document.getElementById('storeUrlInput').value.trim() || '#';
+            if (!name) {
+                alert('Informe o nome da loja ou parceiro!');
+                return;
+            }
+            const stores = JSON.parse(localStorage.getItem('radio_partner_stores')) || defaultStores;
+            stores.unshift({ name, offer: offer || 'Parceiro Oficial da Rádio', url });
+            localStorage.setItem('radio_partner_stores', JSON.stringify(stores));
+            renderStores();
+            document.getElementById('storeNameInput').value = '';
+            document.getElementById('storeOfferInput').value = '';
+            document.getElementById('storeUrlInput').value = '';
+            alert('Loja adicionada na vitrine de parceiros!');
+        }
+
+        function shareRadio() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Rádio & TV Web Sertaneja 24h',
+                    text: 'Ouça a nossa programação ao vivo e confira as ofertas em destaque!',
+                    url: window.location.href
+                }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                alert('Link da rádio copiado!');
+            }
+        }
+
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // INICIALIZAÇÃO
+        window.addEventListener('DOMContentLoaded', () => {
+            renderPlaylist();
+            loadBannerAd();
+            renderStores();
+            fetchLiveBrazilianRadios();
+        });
+    </script>
 </body>
 </html>
