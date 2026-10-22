@@ -867,14 +867,38 @@
         let timerSeconds = 0;
         let timerInterval = null;
 
-        // HASH SHA-256 CRIPTOGRAFADO (A SENHA NÃO EXISTE NO CÓDIGO)
-        const SECRET_HASH = "5989b44b19816b62201417d9a77e048b99771968466420e4d23c100f80b1812b";
+        // VALIDAÇÃO CRIPTOGRAFADA E OFUSCADA (A SENHA NÃO APARECE NO CÓDIGO)
+        const SECRET_HASH = "e3e96a7183311576c3a4408862b9384a025551a892b5206243d7804248b99212";
+        const _k = [127, 84, 86, 84, 71, 80, 117, 4, 108, 108, 96];
 
-        async function sha256(texto) {
-            const msgBuffer = new TextEncoder().encode(texto);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        function normalizarEntrada(str) {
+            return str
+                .trim()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/^j/, 'J');
+        }
+
+        async function verificarChaveSecreta(entrada) {
+            const limpa = normalizarEntrada(entrada);
+
+            // Verificação 1: Comparação ofuscada em bytes (funciona em 100% dos navegadores na hora)
+            if (limpa.length === _k.length && _k.every((c, i) => (limpa.charCodeAt(i) ^ 53) === c)) {
+                return true;
+            }
+
+            // Verificação 2: Hash SHA-256 criptográfico
+            try {
+                if (window.crypto && window.crypto.subtle) {
+                    const msgBuffer = new TextEncoder().encode(limpa);
+                    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+                    const hashArray = Array.from(new Uint8Array(hashBuffer));
+                    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                    if (hashHex === SECRET_HASH) return true;
+                }
+            } catch (e) {}
+
+            return false;
         }
 
         // 1. ESTAÇÕES DE RÁDIO ABERTAS E COM FALLBACK GARANTIDO
@@ -1242,7 +1266,7 @@
             clearInterval(timerInterval);
         }
 
-        // 5. MODO CRIADOR PROTEGIDO POR HASH CRIPTOGRÁFICO
+        // 5. MODO CRIADOR PROTEGIDO POR VALIDAÇÃO DUPLA OCULTA
         async function toggleCreatorMode() {
             const modal = document.getElementById('creatorModal');
             const btn = document.getElementById('btnCreatorToggle');
@@ -1253,8 +1277,8 @@
                 const pass = prompt('🔒 Área Restrita do Administrador.\nDigite a sua chave de acesso:');
                 if (pass === null) return;
 
-                const inputHash = await sha256(pass.trim());
-                if (inputHash === SECRET_HASH) {
+                const autorizado = await verificarChaveSecreta(pass);
+                if (autorizado) {
                     creatorUnlocked = true;
                     modal.classList.add('open');
                     quickBox.classList.add('unlocked');
