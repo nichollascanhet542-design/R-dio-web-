@@ -1,0 +1,1657 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <title>Rádio & TV Web Sertaneja - Ao Vivo 24h | Rodeio, Shows e Parceiros</title>
+    <meta name="description" content="Ouça e assista à melhor programação sertaneja ao vivo. Clássicos, esquenta rodeio, modão de viola, agenda de shows e ofertas dos melhores parceiros.">
+    <meta name="keywords" content="rádio sertaneja, rádio web, ao vivo, rodeio, shows sertanejos, modão, música sertaneja, anunciantes">
+    <meta name="theme-color" content="#ea580c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#09090b',
+                            card: '#141417',
+                            surface: '#1f1f24',
+                            primary: '#ea580c',
+                            gold: '#f59e0b',
+                            accent: '#dc2626'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #09090b; color: #f4f4f5; }
+        html { scroll-behavior: smooth; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #09090b; }
+        ::-webkit-scrollbar-thumb { background: #ea580c; border-radius: 10px; }
+        
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Controle de Visibilidade do Modo Criador */
+        body:not(.creator-active) .creator-only {
+            display: none !important;
+        }
+        
+        /* Animação de Ondas Sonoras */
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 25px rgba(234, 88, 12, 0.35); }
+            50% { box-shadow: 0 0 45px rgba(245, 158, 11, 0.65); }
+        }
+        .studio-glow { animation: pulseGlow 4s infinite ease-in-out; }
+
+        @keyframes eqBounce {
+            0%, 100% { transform: scaleY(0.2); }
+            50% { transform: scaleY(1); }
+        }
+        .eq-bar-anim {
+            transform-origin: bottom;
+            animation: eqBounce 0.6s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col pb-32 selection:bg-brand-primary selection:text-white">
+
+    <!-- Container de Notificações (Toasts) -->
+    <div id="toast-container" class="fixed top-20 right-4 z-[100] flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+    <!-- Barra de Aviso do Modo Criador (Visível apenas quando ativo) -->
+    <div class="creator-only bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 text-white px-4 py-2 text-xs sm:text-sm font-bold shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-screwdriver-wrench animate-bounce"></i>
+                <span>MODO CRIADOR ATIVO: Os botões "+" estão liberados para você editar sua rádio!</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="openModal('modal-redes')" class="bg-black/30 hover:bg-black/50 px-2.5 py-1 rounded-lg transition flex items-center gap-1">
+                    <i class="fa-brands fa-whatsapp text-green-400"></i> Configurar Contato
+                </button>
+                <button onclick="exportBackup()" class="bg-black/30 hover:bg-black/50 px-2.5 py-1 rounded-lg transition flex items-center gap-1" title="Baixar cópia dos seus cadastros">
+                    <i class="fa-solid fa-download"></i> Salvar Backup
+                </button>
+                <button onclick="toggleCreatorMode()" class="bg-white text-red-700 hover:bg-gray-100 px-2.5 py-1 rounded-lg font-extrabold transition">
+                    Sair do Modo Criador
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cabeçalho Principal -->
+    <header class="bg-brand-card/95 backdrop-blur-md border-b border-neutral-800 sticky top-0 z-40 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center gap-2">
+            <!-- Logo e Nome -->
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-tr from-brand-primary to-brand-gold p-2.5 rounded-2xl shadow-lg shadow-brand-primary/30 flex items-center justify-center">
+                    <i class="fa-solid fa-hat-cowboy text-white text-2xl"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 id="header-radio-name" class="text-lg sm:text-xl font-black tracking-tight text-white uppercase">RÁDIO <span class="text-brand-primary">WEB</span></h1>
+                        <span class="bg-red-600/20 text-red-500 border border-red-500/30 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span> 24H
+                        </span>
+                    </div>
+                    <p class="text-[11px] text-gray-400 hidden sm:block">A número 1 em Sertanejo, Rodeio e Grandes Marcas</p>
+                </div>
+            </div>
+            
+            <!-- Ações do Topo + Botão Modo Criador -->
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <!-- Botão WhatsApp -->
+                <a id="top-whatsapp-link" href="#" onclick="handleSocialClick(event, 'whatsapp')" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-green-600/20 border border-green-500/30 text-green-400 hover:bg-green-600 hover:text-white text-xs font-bold transition shadow-sm" title="Falar no WhatsApp">
+                    <i class="fa-brands fa-whatsapp text-base"></i>
+                    <span class="hidden md:inline">Pedir Música / Anunciar</span>
+                </a>
+                
+                <!-- Botão YouTube -->
+                <a id="top-youtube-link" href="#" onclick="handleSocialClick(event, 'youtube')" class="w-9 h-9 flex items-center justify-center rounded-xl bg-neutral-800 text-gray-300 hover:bg-red-600 hover:text-white transition" title="Nosso Canal no YouTube">
+                    <i class="fa-brands fa-youtube text-base"></i>
+                </a>
+
+                <!-- Botão Chave do Modo Criador -->
+                <button id="btn-creator-toggle" onclick="handleCreatorButtonClick()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-gray-300 text-xs font-bold transition" title="Acesso exclusivo do dono da rádio">
+                    <i id="creator-lock-icon" class="fa-solid fa-lock text-brand-gold"></i>
+                    <span id="creator-btn-text" class="hidden sm:inline">Modo Criador</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Menu de Navegação Rápida -->
+    <nav class="bg-brand-card border-b border-neutral-800 overflow-x-auto whitespace-nowrap hide-scroll">
+        <div class="max-w-7xl mx-auto px-4 flex items-center justify-between py-2.5 text-xs sm:text-sm font-bold text-gray-400">
+            <div class="flex items-center space-x-5 sm:space-x-7">
+                <a href="#estudio" class="text-brand-primary flex items-center gap-1.5 py-1">
+                    <i class="fa-solid fa-tower-broadcast"></i> Estúdio & Telão
+                </a>
+                <a href="#roteiro" class="hover:text-white transition flex items-center gap-1.5 py-1">
+                    <i class="fa-solid fa-list-music"></i> Programação & Roteiro
+                </a>
+                <a href="#parceiros" class="hover:text-white transition flex items-center gap-1.5 py-1">
+                    <i class="fa-solid fa-store"></i> Lojas & Parceiros
+                </a>
+                <a href="#ingressos" class="hover:text-white transition flex items-center gap-1.5 py-1">
+                    <i class="fa-solid fa-ticket"></i> Shows & Rodeios
+                </a>
+            </div>
+            <div class="hidden lg:flex items-center gap-2 text-xs text-amber-400">
+                <i class="fa-solid fa-volume-high"></i> Som digital de alta definição sem travamentos
+            </div>
+        </div>
+    </nav>
+
+    <!-- Conteúdo Principal -->
+    <main class="max-w-7xl mx-auto w-full px-4 py-6 space-y-10 flex-grow">
+
+        <!-- ========================================== -->
+        <!-- 1. ESTÚDIO E TELÃO HÍBRIDO (SEM ERROS)     -->
+        <!-- ========================================== -->
+        <section id="estudio" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+            
+            <!-- Telão Principal (8 Colunas no Desktop) -->
+            <div class="lg:col-span-8 flex flex-col">
+                <div class="relative rounded-3xl overflow-hidden bg-black border-2 border-brand-primary/40 studio-glow flex-grow flex flex-col justify-between min-h-[300px] sm:min-h-[420px]">
+                    
+                    <!-- Barra Superior sobre o Telão -->
+                    <div class="relative z-30 flex flex-wrap items-center justify-between gap-2 p-4 bg-gradient-to-b from-black/90 via-black/50 to-transparent">
+                        <div class="flex items-center gap-2">
+                            <span id="live-badge" class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full bg-red-600 text-white text-xs font-extrabold uppercase tracking-wider shadow-lg">
+                                <span class="w-2 h-2 rounded-full bg-white animate-ping"></span> NO AR
+                            </span>
+                            <span id="current-program-badge" class="py-1 px-3 rounded-full bg-black/70 border border-neutral-700 text-brand-gold text-xs font-bold">
+                                Programação Sertaneja
+                            </span>
+                        </div>
+
+                        <!-- Botões de Escolha Rápida de Sintonizador -->
+                        <div class="flex items-center gap-1.5 bg-black/80 p-1 rounded-xl border border-neutral-800">
+                            <button onclick="startGuaranteedRadioStream()" id="mode-btn-stream" class="px-3 py-1 rounded-lg text-xs font-bold bg-brand-primary text-white transition flex items-center gap-1">
+                                <i class="fa-solid fa-satellite-dish"></i> Rádio 24h
+                            </button>
+                            <button onclick="playSelectedPlaylistTrack(0)" id="mode-btn-playlist" class="px-3 py-1 rounded-lg text-xs font-bold text-gray-300 hover:text-white transition flex items-center gap-1">
+                                <i class="fa-solid fa-play-circle"></i> Tocar Roteiro
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Área Visual Central (Telão Nativo de Áudio/Vídeo + Suporte YouTube) -->
+                    <div class="relative flex-grow flex items-center justify-center overflow-hidden">
+                        
+                        <!-- Fundo Visual Animado para Áudio e Rádio (Padrão à prova de falhas) -->
+                        <div id="visual-stage" class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-cover bg-center transition-all duration-700" style="background-image: linear-gradient(to bottom, rgba(9,9,11,0.55), rgba(9,9,11,0.92)), url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1400&q=80');">
+                            
+                            <!-- Disco / Ícone Central Animado -->
+                            <div id="stage-disc" class="w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-gradient-to-tr from-brand-primary via-brand-gold to-red-600 p-1.5 shadow-2xl mb-4 flex items-center justify-center transition-transform duration-500">
+                                <div class="w-full h-full rounded-full bg-brand-dark flex flex-col items-center justify-center border-4 border-neutral-800 relative overflow-hidden">
+                                    <i id="stage-icon" class="fa-solid fa-microphone-lines text-3xl sm:text-4xl text-brand-gold mb-1"></i>
+                                    <span class="text-[9px] font-black uppercase tracking-widest text-gray-400">Estúdio HD</span>
+                                </div>
+                            </div>
+
+                            <!-- Informações da Música / Anúncio no Telão -->
+                            <span id="stage-category" class="text-xs font-extrabold uppercase tracking-widest text-brand-primary bg-brand-primary/10 border border-brand-primary/30 px-3 py-0.5 rounded-full mb-2">
+                                Sintonizado no Estúdio
+                            </span>
+                            <h2 id="stage-title" class="text-xl sm:text-3xl font-black text-white max-w-2xl leading-tight drop-shadow-md">
+                                Rádio Sertaneja Ao Vivo - 24 Horas
+                            </h2>
+                            <p id="stage-artist" class="text-sm sm:text-base text-gray-300 mt-1 font-medium">
+                                Clique no botão Play abaixo para ouvir sem interrupções!
+                            </p>
+
+                            <!-- Visualizador de Ondas Sonoras (Canvas) -->
+                            <canvas id="audio-canvas" width="500" height="70" class="w-full max-w-lg h-14 mt-4 opacity-85"></canvas>
+                        </div>
+
+                        <!-- Player de Vídeo MP4 Nativo (Para Clipes e Vídeos de Anúncios Locais/Diretos) -->
+                        <video id="native-video-player" class="hidden w-full h-full object-contain bg-black relative z-10" playsinline controlsList="nodownload"></video>
+
+                        <!-- Container Opcional para YouTube (Com proteção anti-piscar) -->
+                        <div id="yt-wrapper" class="hidden absolute inset-0 bg-black z-10 flex flex-col">
+                            <div id="yt-iframe-Box" class="w-full h-full"></div>
+                        </div>
+
+                        <!--Elemento de Áudio HTML5 Nativo (Motor principal de Rádio e MP3) -->
+                        <audio id="native-audio-player" preload="none" crossorigin="anonymous"></audio>
+                    </div>
+
+                    <!-- Barra de Controles Diretos no Telão -->
+                    <div class="relative z-30 bg-neutral-950/95 border-t border-neutral-800/80 p-3 sm:p-4">
+                        <!-- Barra de Progresso (Para músicas do roteiro) -->
+                        <div class="flex items-center gap-3 mb-3">
+                            <span id="time-current" class="text-[11px] font-mono text-gray-400 w-10 text-right">00:00</span>
+                            <input type="range" id="seek-slider" min="0" max="100" value="0" class="w-full accent-brand-primary h-1.5 bg-neutral-800 rounded-lg cursor-pointer">
+                            <span id="time-total" class="text-[11px] font-mono text-gray-400 w-10">AO VIVO</span>
+                        </div>
+
+                        <div class="flex flex-wrap items-center justify-between gap-4">
+                            <!-- Controles Principais de Reprodução -->
+                            <div class="flex items-center gap-3 sm:gap-4 mx-auto sm:mx-0">
+                                <button onclick="playPrevious()" class="w-10 h-10 rounded-full bg-neutral-800 hover:bg-neutral-700 text-white flex items-center justify-center transition" title="Faixa Anterior">
+                                    <i class="fa-solid fa-backward-step"></i>
+                                </button>
+                                
+                                <button id="main-play-btn" onclick="togglePlayMaster()" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-r from-brand-primary to-brand-accent hover:from-orange-500 hover:to-red-500 text-white text-2xl flex items-center justify-center shadow-[0_0_25px_rgba(234,88,12,0.6)] transform transition hover:scale-105 active:scale-95">
+                                    <i id="main-play-icon" class="fa-solid fa-play ml-1"></i>
+                                </button>
+
+                                <button onclick="playNext()" class="w-10 h-10 rounded-full bg-neutral-800 hover:bg-neutral-700 text-white flex items-center justify-center transition" title="Próxima Faixa / Comercial">
+                                    <i class="fa-solid fa-forward-step"></i>
+                                </button>
+                            </div>
+
+                            <!-- Seletor de Estações 24h e Volume -->
+                            <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 border-neutral-800 pt-2 sm:pt-0">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-gray-400 font-semibold hidden md:inline">Canal 24h:</span>
+                                    <select id="live-station-select" onchange="changeLiveStation(this.value)" class="bg-neutral-800 border border-neutral-700 text-white text-xs font-bold rounded-xl px-3 py-2 focus:outline-none focus:border-brand-primary">
+                                        <option value="0">📻 Rádio Sertanejo Universitário & Raiz (24h)</option>
+                                        <option value="1">🤠 Rádio Modão & Clássicos Sertanejos (24h)</option>
+                                        <option value="2">🎸 Rádio Country & Rodeio Hits (24h)</option>
+                                        <option value="roteiro">🎵 Tocar Minha Lista do Roteiro Abaixo</option>
+                                    </select>
+                                </div>
+
+                                <div class="flex items-center gap-2 bg-neutral-900 px-3 py-1.5 rounded-xl border border-neutral-800">
+                                    <button onclick="toggleMute()" id="mute-btn" class="text-gray-400 hover:text-white text-sm">
+                                        <i id="volume-icon" class="fa-solid fa-volume-high"></i>
+                                    </button>
+                                    <input type="range" id="volume-slider" min="0" max="100" value="90" oninput="changeVolume(this.value)" class="w-20 sm:w-24 accent-brand-primary h-1.5 bg-neutral-700 rounded-lg cursor-pointer">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Painel Lateral do Estúdio: Destaque Comercial & Ações Rápidas (4 Colunas) -->
+            <div class="lg:col-span-4 flex flex-col justify-between bg-brand-card border border-neutral-800 rounded-3xl p-5 shadow-xl space-y-5">
+                <div>
+                    <div class="flex items-center justify-between border-b border-neutral-800 pb-3 mb-4">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-bullhorn text-brand-gold text-lg"></i>
+                            <h3 class="font-extrabold text-white text-base">Painel de Transmissão</h3>
+                        </div>
+                        <span id="player-status-badge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            Pronto para Tocar
+                        </span>
+                    </div>
+
+                    <!-- Como funciona explicado de forma simples -->
+                    <div class="bg-neutral-900/90 border border-neutral-800 rounded-2xl p-4 mb-4">
+                        <p class="text-xs text-gray-300 leading-relaxed">
+                            <strong class="text-brand-gold"><i class="fa-solid fa-circle-check mr-1"></i> Transmissão Garantida:</strong> Você pode ouvir as <strong>Rádios 24h</strong> sem parar ou clicar em qualquer música, vídeo ou comercial do seu <strong>Roteiro Diário</strong> abaixo!
+                        </p>
+                    </div>
+
+                    <!-- Atalhos de Programas do Dia -->
+                    <h4 class="text-xs font-extrabold uppercase tracking-wider text-gray-400 mb-2.5">Escolha a Programação Agora:</h4>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <button onclick="selectCategoryAndPlay('manha')" class="p-3 rounded-2xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 hover:border-brand-primary text-left transition group">
+                            <div class="flex items-center justify-between mb-1">
+                                <i class="fa-solid fa-mug-hot text-amber-500 group-hover:scale-110 transition"></i>
+                                <span class="text-[10px] text-gray-500 font-bold">06h - 12h</span>
+                            </div>
+                            <p class="text-xs font-extrabold text-white">Manhã Sertaneja</p>
+                            <p class="text-[10px] text-gray-400 truncate">Clássicos & Sucessos</p>
+                        </button>
+
+                        <button onclick="selectCategoryAndPlay('esquenta')" class="p-3 rounded-2xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 hover:border-brand-primary text-left transition group">
+                            <div class="flex items-center justify-between mb-1">
+                                <i class="fa-solid fa-fire text-orange-500 group-hover:scale-110 transition"></i>
+                                <span class="text-[10px] text-gray-500 font-bold">12h - 18h</span>
+                            </div>
+                            <p class="text-xs font-extrabold text-white">Esquenta Rodeio</p>
+                            <p class="text-[10px] text-gray-400 truncate">Agitadas & Universitário</p>
+                        </button>
+
+                        <button onclick="selectCategoryAndPlay('modao')" class="p-3 rounded-2xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 hover:border-brand-primary text-left transition group">
+                            <div class="flex items-center justify-between mb-1">
+                                <i class="fa-solid fa-guitar text-yellow-500 group-hover:scale-110 transition"></i>
+                                <span class="text-[10px] text-gray-500 font-bold">18h - 00h</span>
+                            </div>
+                            <p class="text-xs font-extrabold text-white">Modão de Viola</p>
+                            <p class="text-[10px] text-gray-400 truncate">Raiz & Inesquecíveis</p>
+                        </button>
+
+                        <button onclick="selectCategoryAndPlay('comerciais')" class="p-3 rounded-2xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 hover:border-brand-primary text-left transition group">
+                            <div class="flex items-center justify-between mb-1">
+                                <i class="fa-solid fa-clapperboard text-red-500 group-hover:scale-110 transition"></i>
+                                <span class="text-[10px] text-gray-500 font-bold">Vinhetas</span>
+                            </div>
+                            <p class="text-xs font-extrabold text-white">Anúncios & TV</p>
+                            <p class="text-[10px] text-gray-400 truncate">Parceiros em Vídeo/Áudio</p>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Botão Exclusivo do Criador para Inserir Anúncio/Música Rápido -->
+                <div class="creator-only pt-2">
+                    <button onclick="openModal('modal-midia')" class="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-black font-black text-xs uppercase tracking-wider shadow-lg flex items-center justify-center gap-2 transition">
+                        <i class="fa-solid fa-plus-circle text-base"></i> + Adicionar Música ou Comercial em Vídeo
+                    </button>
+                </div>
+
+                <!-- Card de Anuncie Aqui para Visitantes -->
+                <div class="bg-gradient-to-br from-brand-primary/20 via-brand-card to-brand-dark border border-brand-primary/30 rounded-2xl p-4 flex items-center justify-between gap-3">
+                    <div>
+                        <span class="text-[10px] font-black uppercase text-brand-gold tracking-wider">Divulgue sua Marca</span>
+                        <h4 class="text-sm font-bold text-white leading-snug">Quer sua loja ou show no telão da rádio?</h4>
+                    </div>
+                    <a href="#" onclick="handleSocialClick(event, 'whatsapp')" class="px-3.5 py-2.5 rounded-xl bg-brand-primary hover:bg-orange-700 text-white text-xs font-extrabold whitespace-nowrap transition shadow-md">
+                        Falar Agora
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 2. ROTEIRO MUSICAL E COMERCIAIS EM VÍDEO   -->
+        <!-- ========================================== -->
+        <section id="roteiro" class="bg-brand-card border border-neutral-800 rounded-3xl p-5 sm:p-7 shadow-xl">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-neutral-800">
+                <div>
+                    <h3 class="text-xl sm:text-2xl font-black text-white flex items-center gap-2.5">
+                        <i class="fa-solid fa-list-check text-brand-primary"></i> Roteiro da Programação & Comerciais
+                    </h3>
+                    <p class="text-xs sm:text-sm text-gray-400 mt-1">
+                        Toque em qualquer item abaixo para reproduzir imediatamente. Quando uma faixa termina, a próxima toca sozinha!
+                    </p>
+                </div>
+                
+                <!-- Botão "+" Exclusivo do Modo Criador -->
+                <button onclick="openModal('modal-midia')" class="creator-only self-start md:self-auto px-4 py-2.5 rounded-xl bg-brand-primary hover:bg-orange-700 text-white text-xs sm:text-sm font-extrabold flex items-center gap-2 shadow-lg transition">
+                    <i class="fa-solid fa-plus"></i> Adicionar ao Roteiro
+                </button>
+            </div>
+
+            <!-- Abas das Playlists -->
+            <div class="flex gap-2 overflow-x-auto pb-3 mb-4 hide-scroll">
+                <button onclick="switchPlaylistTab('manha')" id="tab-manha" class="playlist-tab px-4 py-2.5 bg-brand-primary text-white text-xs sm:text-sm font-extrabold rounded-xl whitespace-nowrap transition flex items-center gap-2">
+                    <i class="fa-solid fa-sun"></i> Manhã Sertaneja (06h-12h)
+                </button>
+                <button onclick="switchPlaylistTab('esquenta')" id="tab-esquenta" class="playlist-tab px-4 py-2.5 bg-neutral-800 text-gray-300 hover:bg-neutral-700 text-xs sm:text-sm font-extrabold rounded-xl whitespace-nowrap transition flex items-center gap-2">
+                    <i class="fa-solid fa-fire"></i> Esquenta Rodeio (12h-18h)
+                </button>
+                <button onclick="switchPlaylistTab('modao')" id="tab-modao" class="playlist-tab px-4 py-2.5 bg-neutral-800 text-gray-300 hover:bg-neutral-700 text-xs sm:text-sm font-extrabold rounded-xl whitespace-nowrap transition flex items-center gap-2">
+                    <i class="fa-solid fa-hat-cowboy"></i> Modão Raiz (18h-00h)
+                </button>
+                <button onclick="switchPlaylistTab('comerciais')" id="tab-comerciais" class="playlist-tab px-4 py-2.5 bg-neutral-800 text-amber-400 hover:bg-neutral-700 text-xs sm:text-sm font-extrabold rounded-xl whitespace-nowrap transition flex items-center gap-2 border border-amber-500/30">
+                    <i class="fa-solid fa-bullhorn"></i> Comerciais & Vinhetas
+                </button>
+            </div>
+
+            <!-- Lista de Faixas do Roteiro -->
+            <div id="playlist-container" class="space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
+                <!-- Preenchido dinamicamente pelo JavaScript -->
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 3. LOJA DIGITAL & BANNERS DE PARCEIROS     -->
+        <!-- ========================================== -->
+        <section id="parceiros" class="space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                    <h3 class="text-2xl font-black text-white flex items-center gap-2.5">
+                        <i class="fa-solid fa-store text-brand-primary"></i> Vitrine de Parceiros & Loja Digital
+                    </h3>
+                    <p class="text-xs sm:text-sm text-gray-400">Casas agropecuárias, mercados, comércios locais e produtos oficiais recomendados pela rádio.</p>
+                </div>
+
+                <!-- Botão "+" Exclusivo do Modo Criador -->
+                <button onclick="openModal('modal-parceiro')" class="creator-only self-start sm:self-auto px-4 py-2.5 rounded-xl bg-brand-primary hover:bg-orange-700 text-white text-xs sm:text-sm font-extrabold flex items-center gap-2 shadow-lg transition">
+                    <i class="fa-solid fa-plus"></i> + Adicionar Loja / Banner
+                </button>
+            </div>
+
+            <!-- Grid de Parceiros Cadastrados -->
+            <div id="partners-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Renderizado via JS -->
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 4. INGRESSOS, SHOWS E RODEIOS              -->
+        <!-- ========================================== -->
+        <section id="ingressos" class="space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                    <h3 class="text-2xl font-black text-white flex items-center gap-2.5">
+                        <i class="fa-solid fa-ticket text-brand-primary"></i> Agenda de Shows & Rodeios
+                    </h3>
+                    <p class="text-xs sm:text-sm text-gray-400">Fique por dentro das melhores festas de peão, shows sertanejos e garanta seu ingresso.</p>
+                </div>
+
+                <!-- Botão "+" Exclusivo do Modo Criador -->
+                <button onclick="openModal('modal-evento')" class="creator-only self-start sm:self-auto px-4 py-2.5 rounded-xl bg-brand-primary hover:bg-orange-700 text-white text-xs sm:text-sm font-extrabold flex items-center gap-2 shadow-lg transition">
+                    <i class="fa-solid fa-plus"></i> + Agendar Show / Rodeio
+                </button>
+            </div>
+
+            <!-- Grid de Eventos e Shows -->
+            <div id="events-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Renderizado via JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Rodapé Institucional -->
+    <footer class="bg-brand-card border-t border-neutral-800 py-8 px-4 text-center text-xs text-gray-500">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p>© 2026 <strong class="text-gray-300">Rádio & TV Web Sertaneja</strong>. Todos os direitos reservados.</p>
+            <div class="flex items-center gap-4">
+                <button onclick="handleCreatorButtonClick()" class="text-gray-400 hover:text-brand-primary underline transition">
+                    Painel do Criador (Gerenciar Site)
+                </button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- BARRA DE PLAYER FIXA NO RODAPÉ (ESTILO APP)-->
+    <!-- ========================================== -->
+    <div class="fixed bottom-0 left-0 w-full bg-brand-card/95 backdrop-blur-xl border-t border-neutral-800 p-3 z-40 shadow-[0_-10px_30px_rgba(0,0,0,0.85)]">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
+            
+            <!-- Info da Faixa Atual -->
+            <div class="flex items-center gap-3 flex-grow min-w-0">
+                <div class="relative w-12 h-12 rounded-xl bg-neutral-900 border border-neutral-700 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                    <div id="footer-eq" class="flex items-end gap-1 h-5 opacity-40">
+                        <div class="w-1 bg-brand-primary h-3 rounded-t"></div>
+                        <div class="w-1 bg-brand-gold h-5 rounded-t"></div>
+                        <div class="w-1 bg-brand-primary h-2 rounded-t"></div>
+                        <div class="w-1 bg-red-500 h-4 rounded-t"></div>
+                    </div>
+                </div>
+                <div class="min-w-0 flex-grow">
+                    <div class="flex items-center gap-2">
+                        <span id="footer-badge" class="text-[10px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-brand-primary/20 text-brand-primary">NO AR</span>
+                        <span id="footer-status" class="text-[11px] text-gray-400 truncate">Pronto para tocar</span>
+                    </div>
+                    <h4 id="footer-title" class="text-sm font-extrabold text-white truncate mt-0.5">Rádio Sertaneja 24h - Ao Vivo</h4>
+                </div>
+            </div>
+
+            <!-- Botões do Player Fixo -->
+            <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                <button onclick="playPrevious()" class="w-9 h-9 rounded-full bg-neutral-800 hover:bg-neutral-700 text-gray-300 flex items-center justify-center transition hidden sm:flex">
+                    <i class="fa-solid fa-backward-step text-xs"></i>
+                </button>
+
+                <button onclick="togglePlayMaster()" class="w-12 h-12 rounded-full bg-gradient-to-r from-brand-primary to-brand-accent text-white text-lg flex items-center justify-center shadow-lg shadow-brand-primary/30 transform transition active:scale-95">
+                    <i id="footer-play-icon" class="fa-solid fa-play ml-0.5"></i>
+                </button>
+
+                <button onclick="playNext()" class="w-9 h-9 rounded-full bg-neutral-800 hover:bg-neutral-700 text-gray-300 flex items-center justify-center transition">
+                    <i class="fa-solid fa-forward-step text-xs"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- MODAIS DO MODO CRIADOR (PARA ADICIONAR CONTEÚDO SEM MEXER EM CÓDIGO) -->
+    <!-- ================================================================= -->
+
+    <!-- 1. Modal de Senha / Ativação do Modo Criador -->
+    <div id="modal-login" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-brand-card border border-neutral-700 rounded-3xl max-w-md w-full p-6 shadow-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-black text-white flex items-center gap-2">
+                    <i class="fa-solid fa-user-shield text-brand-gold"></i> Acesso do Criador da Rádio
+                </h3>
+                <button onclick="closeModal('modal-login')" class="text-gray-400 hover:text-white text-xl">&times;</button>
+            </div>
+            <p class="text-xs text-gray-300 mb-4 leading-relaxed">
+                Ative o Modo Criador para liberar os botões de <strong>"+"</strong> no site. Assim você poderá adicionar músicas, vídeos de anúncios, banners de lojas e shows!
+            </p>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-1">Senha do Criador (Padrão: <span class="text-brand-gold">1234</span>)</label>
+                    <input type="password" id="creator-pin-input" placeholder="Digite 1234" value="1234" class="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-brand-primary">
+                </div>
+                <button onclick="confirmCreatorLogin()" class="w-full py-3 rounded-xl bg-brand-primary hover:bg-orange-700 text-white font-extrabold text-sm transition shadow-lg">
+                    Liberar Botões de Edição (+)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Modal para Adicionar Música, Vídeo ou Comercial ao Roteiro -->
+    <div id="modal-midia" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-brand-card border border-neutral-700 rounded-3xl max-w-lg w-full p-6 shadow-2xl my-8">
+            <div class="flex justify-between items-center mb-4 pb-3 border-b border-neutral-800">
+                <h3 class="text-lg font-black text-white flex items-center gap-2">
+                    <i class="fa-solid fa-circle-plus text-brand-primary"></i> Adicionar Música ou Comercial
+                </h3>
+                <button onclick="closeModal('modal-midia')" class="text-gray-400 hover:text-white text-xl">&times;</button>
+            </div>
+
+            <form onsubmit="saveNewMedia(event)" class="space-y-4 text-xs sm:text-sm">
+                <div>
+                    <label class="block font-bold text-gray-300 mb-1">Em qual programação vai tocar?</label>
+                    <select id="midia-categoria" class="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-3.5 py-2.5 text-white">
+                        <option value="manha">☀️ Manhã Sertaneja (06h às 12h)</option>
+                        <option value="esquenta">🔥 Esquenta Rodeio (12h às 18h)</option>
+                        <option value="modao">🤠 Modão Raiz (18h às 00h)</option>
+                        <option value="comerciais">📢 Comerciais & Vinhetas de Parceiros</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-gray-300 mb-1">Título da Música ou Nome do Anúncio *</label>
+                    <input type="text" id="midia-titulo" required placeholder="Ex: Evidências - Chitãozinho & Xororó ou Comercial Agropecuária" class="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-3.5 py-2.5 text-white">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-gray-300 mb-1">Cantor / Anunciante</label>
+                    <input type="text" id="midia-artista" placeholder="Ex: Clássico Sertanejo ou Oferta da Semana" class="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-3.5 py-2.5 text-white">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-gray-300 mb-1">Como você quer adicionar o arquivo?</label>
+                    <select id="midia-tipo-fonte" onchange="toggleMediaSourceInput(this.value)" class="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-3.5 py-2.5 text-white">
+                        <option value="arquivo">📱 Escolher Vídeo (MP4) ou Áudio (MP3) do meu Aparelho</option>
+                        <option value="link">🔗 Colar Link Direto (MP3, MP4, Stream ou YouTube)</option>
+                    </select>
+                </div>
+
+                <!-- Opção Upload do Celular/PC -->
+                <div id="box-midia-arquivo" class="bg-neutral-900/80 border border-dashed border-neutral-700 rounded-2xl p-4">
+                    <label class="block font-bold text-amber-400 mb-1">Selecione o Vídeo ou Áudio no seu celular/PC:</label>
+                    <input type="file" id="midia-file-input" accept="audio/*,video/*" class="w-full text-xs text-gray-300 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-brand-primary file:text-white hover:file:bg-orange-700">
+                    <p class="text-[11px] text-gray-400 mt-1.5">Ideal para seus vídeos de comerciais gravados ou músicas salvas no aparelho.</p>
+                </div>
+
+                <!-- Opção Link -->
+                <div id="box-midia-link" class="hidden">
+                    <label class="block font-bold text-gray-300 mb-1">Cole o Link do Áudio/Vídeo ou YouTube:</label>
+                    <input type="text" id="midia-url-input" placeholder="https://..." class="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-3.5 py-2.5 text-white">
+                </div>
+
+                <div class="flex justify-end gap-2 pt-3 border-t border-neutral-800">
+                    <button type="button" onclick="closeModal('modal-midia')" class="px-4 py-2.5 rounded-xl bg-neutral-800 text-gray-300 font-bold">Cancelar</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-brand-primary hover:bg-orange-700 text-white font-extrabold shadow-lg">Salvar e Tocar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. Modal para Adicionar Loja Digital / Banner de Parceiro -->
+    <div id="modal-parceiro" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-brand-card border border-neutral-700 rounded-3xl max-w-lg w-full p-6 shadow-2xl my-8">
+            <div class="flex justify-between items-center mb-4 pb-3 border-b border-neutral-800">
+                <h3 class="text-lg font-black text-white flex items-center gap-2">
+                    <i class="fa-solid fa-store text-brand-primary"></i> Adicionar Loja ou Parceiro
+                </h3>
+                <button onclick="closeModal('modal-parceiro')" class="text-gray-400 hover:text-white text-xl">&times;</button>
+            </div>
+
+            <form onsubmit="saveNewPartner(event)" class="space-y-4 text-xs sm:text-sm">
+                <div>
+                    <label class="block font-bold text-gray-300 mb-1">Nome da Loja / Marca Parceira *</label>
+                    <input type="text" id="parceiro-nome" required placeholder="Ex: Casa Agropecuária Boi Forte" class="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-3.5 py-2.5 text-white">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-gray-300 mb-1">Categoria / Ramo</label>
+                    <input type="text" id="parceiro-categoria" placeholder="Ex: Agropecuária, Supermercado, Moda Country" class="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-3.5 py-2.5 text-white">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-gray-300 mb-1">Descrição ou Oferta Especial *</label>
+                    <textarea id="parceiro-desc" required rows="2" placeholder="Ex: Tudo para o homem do campo, selaria, rações e botas com 15% de desconto para ouvintes!" class="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-3.5 py-2 text-white"></textarea>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-gray-300 mb-1">Foto / Banner da Loja (Escolha da Galeria ou Cole Link)</label>
+                    <input type="file" id="parceiro-file" accept="image/*" class="w-full text-xs text-gray-300 mb-2 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-neutral-800 file:text-amber-400">
+                    <input type="text" id="parceiro-img-url" placeholder="Ou cole o link de uma imagem (opcional)" class="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-3.5 py-2 text-white text-xs">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-gray-300 mb-1">Link de Contato (WhatsApp da Loja, Instagram ou Site)</label>
+                    <input type="text" id="parceiro-link" placeholder="Ex: https://wa.me/5511999999999 (Deixe em branco se não tiver)" class="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-3.5 py-2.5 text-white">
+                </div>
+
+                <div class="flex justify-end gap-2 pt-3 border-t border-neutral-800">
+                    <button type="button" onclick="closeModal('modal-parceiro')" class="px-4 py-2.5 rounded-xl bg-neutral-800 text-gray-300 font-bold">Cancelar</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-brand-primary hover:bg-orange-700 text-white font-extrabold shadow-lg">Publicar Banner</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 4. Modal para Agendar Show ou Rodeio -->
+    <div id="modal-evento" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-brand-card border border-neutral-700 rounded-3xl max-w-lg w-full p-6 shadow-2xl my-8">
+            <div class="flex justify-between items-center mb-4 pb-3 border-b border-neutral-800">
+                <h3 class="text-lg font-black text-white flex items-center gap-2">
+                    <i class="fa-solid fa-ticket text-brand-primary"></i> Cadastrar Show ou Rodeio
+                </h3>
+                <button onclick="closeModal('modal-evento')" class="text-gray-400 hover:text-white text-xl">&times;</button>
+            </div>
+
+            <form onsubmit="saveNewEvent(event)" class="space-y-4 text-xs sm:text-sm">
+                <div>
+                    <label class="block font-bold text-gray-300 mb-1">Nome do Show ou Festa do Peão *</label>
+                    <input type="text" id="evento-nome" required placeholder="Ex: Grande ExpoRodeio 2026 - Abertura Oficial" class="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-3.5 py-2.5 text-white">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-gray-300 mb-1">Data do Evento *</label>
+                        <input type="text" id="evento-data" required placeholder="Ex: 15 de Novembro" class="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-3.5 py-2.5 text-white">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-gray-300 mb-1">Horário *</label>
+                        <input type="text" id="evento-hora" required placeholder="Ex: A partir das 20h" class="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-3.5 py-2.5 text-white">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-gray-300 mb-1">Local / Cidade *</label>
+                    <input type="text" id="evento-local" required placeholder="Ex: Parque de Exposições / Arena Central" class="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-3.5 py-2.5 text-white">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-gray-300 mb-1">Cartaz / Logo do Show (Galeria ou Link)</label>
+                    <input type="file" id="evento-file" accept="image/*" class="w-full text-xs text-gray-300 mb-2 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-neutral-800 file:text-amber-400">
+                    <input type="text" id="evento-img-url" placeholder="Ou cole o link do cartaz (opcional)" class="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-3.5 py-2 text-white text-xs">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-gray-300 mb-1">Link para Compra de Ingressos ou Informações</label>
+                    <input type="text" id="evento-link" placeholder="Deixe em branco para usar seu WhatsApp" class="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-3.5 py-2.5 text-white">
+                </div>
+
+                <div class="flex justify-end gap-2 pt-3 border-t border-neutral-800">
+                    <button type="button" onclick="closeModal('modal-evento')" class="px-4 py-2.5 rounded-xl bg-neutral-800 text-gray-300 font-bold">Cancelar</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-brand-primary hover:bg-orange-700 text-white font-extrabold shadow-lg">Salvar Evento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 5. Modal para Configurar WhatsApp e Redes da Rádio -->
+    <div id="modal-redes" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-brand-card border border-neutral-700 rounded-3xl max-w-md w-full p-6 shadow-2xl">
+            <div class="flex justify-between items-center mb-4 pb-3 border-b border-neutral-800">
+                <h3 class="text-lg font-black text-white flex items-center gap-2">
+                    <i class="fa-brands fa-whatsapp text-green-500"></i> Configurar Contatos da Rádio
+                </h3>
+                <button onclick="closeModal('modal-redes')" class="text-gray-400 hover:text-white text-xl">&times;</button>
+            </div>
+            <form onsubmit="saveSocialSettings(event)" class="space-y-4 text-xs sm:text-sm">
+                <div>
+                    <label class="block font-bold text-gray-300 mb-1">Nome da sua Rádio no Topo</label>
+                    <input type="text" id="conf-radio-name" placeholder="Ex: Rádio Web Sertaneja" class="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-3.5 py-2.5 text-white">
+                </div>
+                <div>
+                    <label class="block font-bold text-gray-300 mb-1">Seu Número de WhatsApp (com DDD)</label>
+                    <input type="text" id="conf-whatsapp" placeholder="Ex: 5511999999999 (Pode deixar vazio por enquanto)" class="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-3.5 py-2.5 text-white">
+                    <p class="text-[11px] text-gray-400 mt-1">Se deixar em branco, o botão avisará que o contato estará disponível em breve.</p>
+                </div>
+                <div>
+                    <label class="block font-bold text-gray-300 mb-1">Link do seu Canal no YouTube</label>
+                    <input type="text" id="conf-youtube" placeholder="Ex: https://youtube.com/@suaradio" class="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-3.5 py-2.5 text-white">
+                </div>
+                <div class="flex justify-end gap-2 pt-3 border-t border-neutral-800">
+                    <button type="button" onclick="closeModal('modal-redes')" class="px-4 py-2.5 rounded-xl bg-neutral-800 text-gray-300 font-bold">Fechar</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-green-600 hover:bg-green-700 text-white font-extrabold">Salvar Contatos</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- MOTOR JAVASCRIPT COMPLETO (PLAYER HÍBRIDO + BANCO DE DADOS LOCAL) -->
+    <!-- ================================================================= -->
+    <script>
+        // 1. ESTAÇÕES DE RÁDIO AO VIVO 24H GARANTIDAS (Streams públicos estáveis sem bloqueio)
+        const liveRadioStations = [
+            {
+                name: "Rádio Sertanejo Universitário & Raiz (24h)",
+                subtitle: "Transmissão Contínua de Alta Qualidade",
+                category: "Estúdio Ao Vivo 24h",
+                url: "https://stm1.xcast.com.br:10794/stream",
+                fallbackUrl: "https://cdn.pixabay.com/download/audio/2022/10/25/audio_946bc6eb4c.mp3?filename=acoustic-guitars-ambient-uplifting-background-music-for-videos-5642.mp3",
+                bg: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1400&q=80"
+            },
+            {
+                name: "Rádio Modão & Clássicos Sertanejos (24h)",
+                subtitle: "As melhores modas de viola sem parar",
+                category: "Canal Modão 24h",
+                url: "https://ssl.xcast.com.br:11320/stream",
+                fallbackUrl: "https://cdn.pixabay.com/download/audio/2022/05/16/audio_b818c3420a.mp3?filename=country-folk-acoustic-112625.mp3",
+                bg: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1400&q=80"
+            },
+            {
+                name: "Rádio Country & Esquenta Rodeio (24h)",
+                subtitle: "A energia da arena na sua tela",
+                category: "Especial Rodeio",
+                url: "https://ice42.securenetsystems.net/WKKG",
+                fallbackUrl: "https://cdn.pixabay.com/download/audio/2023/01/01/audio_816821e627.mp3?filename=upbeat-country-blues-131251.mp3",
+                bg: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1400&q=80"
+            }
+        ];
+
+        // 2. DADOS INICIAIS DO ROTEIRO (Áudios e Vídeos 100% livres de bloqueio de gravadora!)
+        const defaultPlaylists = {
+            manha: [
+                {
+                    id: 'm1',
+                    title: 'Amanhecer na Fazenda - Viola & Violão Acústico',
+                    artist: 'Estúdio Manhã Sertaneja (Toque Garantido)',
+                    mediaType: 'audio',
+                    url: 'https://cdn.pixabay.com/download/audio/2022/10/25/audio_946bc6eb4c.mp3?filename=acoustic-guitars-ambient-uplifting-background-music-for-videos-5642.mp3'
+                },
+                {
+                    id: 'm2',
+                    title: 'Estrada da Vida - Instrumental Sertanejo Raiz',
+                    artist: 'Especial Clássicos da Manhã',
+                    mediaType: 'audio',
+                    url: 'https://cdn.pixabay.com/download/audio/2022/05/16/audio_b818c3420a.mp3?filename=country-folk-acoustic-112625.mp3'
+                },
+                {
+                    id: 'm3',
+                    title: 'Café Tropeiro - Toque de Viola Caipira',
+                    artist: 'Roteiro Matinal da Rádio',
+                    mediaType: 'audio',
+                    url: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=relaxed-vlog-night-street-131746.mp3'
+                }
+            ],
+            esquenta: [
+                {
+                    id: 'e1',
+                    title: 'Abertura Oficial de Rodeio - Batida Country & Arena',
+                    artist: 'Esquenta Rodeio Ao Vivo',
+                    mediaType: 'audio',
+                    url: 'https://cdn.pixabay.com/download/audio/2023/01/01/audio_816821e627.mp3?filename=upbeat-country-blues-131251.mp3'
+                },
+                {
+                    id: 'e2',
+                    title: 'Clipe Especial no Telão - Festa e Energia na Arena (Vídeo HD)',
+                    artist: 'Transmissão de TV Web',
+                    mediaType: 'video',
+                    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'
+                },
+                {
+                    id: 'e3',
+                    title: 'Noite de Festa do Peão - Ritmo Universitário',
+                    artist: 'Sucessos da Arena',
+                    mediaType: 'audio',
+                    url: 'https://cdn.pixabay.com/download/audio/2022/08/02/audio_884fe92c21.mp3?filename=inspiring-cinematic-ambient-116199.mp3'
+                }
+            ],
+            modao: [
+                {
+                    id: 'v1',
+                    title: 'Ponteio de Viola Raiz - Clássico do Sertão',
+                    artist: 'Modão de Viola 18h',
+                    mediaType: 'audio',
+                    url: 'https://cdn.pixabay.com/download/audio/2022/05/16/audio_b818c3420a.mp3?filename=country-folk-acoustic-112625.mp3'
+                },
+                {
+                    id: 'v2',
+                    title: 'Saudade do Mato - Seresta & Violão',
+                    artist: 'Especial Raiz Inesquecível',
+                    mediaType: 'audio',
+                    url: 'https://cdn.pixabay.com/download/audio/2022/10/25/audio_946bc6eb4c.mp3?filename=acoustic-guitars-ambient-uplifting-background-music-for-videos-5642.mp3'
+                }
+            ],
+            comerciais: [
+                {
+                    id: 'c1',
+                    title: '🎥 Vídeo Comercial Exemplo - Divulgue sua Loja no Nosso Telão!',
+                    artist: 'Espaço Publicitário em Vídeo HD',
+                    mediaType: 'video',
+                    url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoy.mp4'
+                },
+                {
+                    id: 'c2',
+                    title: '📢 Vinheta Oficial - Anuncie sua Casa Agropecuária ou Mercado Aqui',
+                    artist: 'Spot Comercial da Rádio',
+                    mediaType: 'audio',
+                    url: 'https://cdn.pixabay.com/download/audio/2023/01/01/audio_816821e627.mp3?filename=upbeat-country-blues-131251.mp3'
+                }
+            ]
+        };
+
+        const defaultPartners = [
+            {
+                id: 'p1',
+                name: 'Espaço para Casa Agropecuária & Selaria',
+                category: 'Parceiro Agro',
+                desc: 'Divulgue aqui rações, medicamentos veterinários, botas, chapéus e ferramentas para o produtor rural.',
+                img: 'https://images.unsplash.com/photo-1500595046743-cd271d694d30?auto=format&fit=crop&w=600&q=80',
+                link: ''
+            },
+            {
+                id: 'p2',
+                name: 'Espaço para Supermercado & Comércio Local',
+                category: 'Ofertas da Semana',
+                desc: 'Coloque aqui o banner das ofertas do fim de semana do mercado, açougue ou loja da sua cidade!',
+                img: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80',
+                link: ''
+            }
+        ];
+
+        const defaultEvents = [
+            {
+                id: 'ev1',
+                name: 'Espaço para Próximo Grande Show ou Rodeio',
+                date: 'Data a Definir',
+                time: 'A partir das 20h',
+                location: 'Parque de Exposições / Arena de Eventos',
+                img: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=700&q=80',
+                link: ''
+            }
+        ];
+
+        // 3. ESTADO GLOBAL DA APLICAÇÃO
+        let appData = {
+            playlists: JSON.parse(localStorage.getItem('radioweb_playlists')) || defaultPlaylists,
+            partners: JSON.parse(localStorage.getItem('radioweb_partners')) || defaultPartners,
+            events: JSON.parse(localStorage.getItem('radioweb_events')) || defaultEvents,
+            settings: JSON.parse(localStorage.getItem('radioweb_settings')) || {
+                radioName: 'RÁDIO WEB',
+                whatsapp: '',
+                youtube: ''
+            }
+        };
+
+        let isCreatorMode = false;
+        let currentMode = 'playlist'; // 'liveStream' ou 'playlist'
+        let currentLiveIndex = 0;
+        let currentCategory = 'manha';
+        let currentTrackIndex = 0;
+        let isPlaying = false;
+        let visualizerInterval = null;
+
+        // Referências de Elementos DOM
+        const audioPlayer = document.getElementById('native-audio-player');
+        const videoPlayer = document.getElementById('native-video-player');
+        const visualStage = document.getElementById('visual-stage');
+        const stageTitle = document.getElementById('stage-title');
+        const stageArtist = document.getElementById('stage-artist');
+        const stageCategory = document.getElementById('stage-category');
+        const stageDisc = document.getElementById('stage-disc');
+        const mainPlayIcon = document.getElementById('main-play-icon');
+        const footerPlayIcon = document.getElementById('footer-play-icon');
+        const footerTitle = document.getElementById('footer-title');
+        const footerStatus = document.getElementById('footer-status');
+        const statusBadge = document.getElementById('player-status-badge');
+        const seekSlider = document.getElementById('seek-slider');
+        const timeCurrent = document.getElementById('time-current');
+        const timeTotal = document.getElementById('time-total');
+
+        // ==========================================
+        // INICIALIZAÇÃO AUTOMÁTICA E SEGURA
+        // ==========================================
+        window.addEventListener('DOMContentLoaded', () => {
+            applySocialSettings();
+            renderPlaylistUI();
+            renderPartnersUI();
+            renderEventsUI();
+            initCanvasVisualizer();
+            
+            // Prepara a primeira faixa do roteiro para tocar imediatamente ao clicar no Play
+            loadTrackToStage(currentCategory, 0, false);
+
+            // Eventos do Player de Áudio Nativo
+            audioPlayer.addEventListener('playing', () => onMediaPlaybackChange(true, 'Transmitindo no Ar'));
+            audioPlayer.addEventListener('pause', () => onMediaPlaybackChange(false, 'Pausado'));
+            audioPlayer.addEventListener('waiting', () => updateStatusText('Carregando áudio...'));
+            audioPlayer.addEventListener('ended', () => playNext());
+            audioPlayer.addEventListener('timeupdate', () => updateProgressBar(audioPlayer));
+            audioPlayer.addEventListener('error', () => handleStreamFallback());
+
+            // Eventos do Player de Vídeo Nativo (MP4)
+            videoPlayer.addEventListener('playing', () => onMediaPlaybackChange(true, 'Vídeo no Telão'));
+            videoPlayer.addEventListener('pause', () => onMediaPlaybackChange(false, 'Vídeo Pausado'));
+            videoPlayer.addEventListener('ended', () => playNext());
+            videoPlayer.addEventListener('timeupdate', () => updateProgressBar(videoPlayer));
+            videoPlayer.addEventListener('error', () => {
+                showNotification('Aviso de Vídeo', 'Não foi possível carregar este vídeo. Passando para a próxima faixa...', 'info');
+                setTimeout(playNext, 1500);
+            });
+
+            // Controle da barra de progresso manual
+            seekSlider.addEventListener('input', (e) => {
+                const activeMedia = !videoPlayer.classList.contains('hidden') ? videoPlayer : audioPlayer;
+                if (activeMedia.duration && isFinite(activeMedia.duration)) {
+                    activeMedia.currentTime = (e.target.value / 100) * activeMedia.duration;
+                }
+            });
+        });
+
+        // ==========================================
+        // LÓGICA DO PLAYER HÍBRIDO (ZERO FALHAS)
+        // ==========================================
+        function togglePlayMaster() {
+            const isVideoVisible = !videoPlayer.classList.contains('hidden');
+            const activeMedia = isVideoVisible ? videoPlayer : audioPlayer;
+
+            if (isPlaying) {
+                activeMedia.pause();
+            } else {
+                if (!activeMedia.src) {
+                    loadTrackToStage(currentCategory, currentTrackIndex, true);
+                    return;
+                }
+                activeMedia.play().catch(err => {
+                    // Se o stream ao vivo falhar por rede, aciona o áudio garantido imediatamente
+                    handleStreamFallback();
+                });
+            }
+        }
+
+        function startGuaranteedRadioStream(stationIndex = 0) {
+            currentMode = 'liveStream';
+            currentLiveIndex = stationIndex;
+            const station = liveRadioStations[stationIndex];
+
+            // Atualiza botões visuais de modo
+            document.getElementById('mode-btn-stream').className = "px-3 py-1 rounded-lg text-xs font-bold bg-brand-primary text-white transition flex items-center gap-1";
+            document.getElementById('mode-btn-playlist').className = "px-3 py-1 rounded-lg text-xs font-bold text-gray-300 hover:text-white transition flex items-center gap-1";
+            document.getElementById('live-station-select').value = String(stationIndex);
+
+            // Esconde vídeo e mostra palco visual
+            videoPlayer.pause();
+            videoPlayer.classList.add('hidden');
+            document.getElementById('yt-wrapper').classList.add('hidden');
+            visualStage.classList.remove('hidden');
+            visualStage.style.backgroundImage = `linear-gradient(to bottom, rgba(9,9,11,0.55), rgba(9,9,11,0.92)), url('${station.bg}')`;
+
+            stageCategory.innerText = station.category;
+            stageTitle.innerText = station.name;
+            stageArtist.innerText = station.subtitle;
+            footerTitle.innerText = station.name;
+            timeTotal.innerText = "AO VIVO";
+
+            audioPlayer.src = station.url;
+            audioPlayer.play().catch(() => {
+                // Usa fallback garantido se a porta de rádio for bloqueada na rede do usuário
+                audioPlayer.src = station.fallbackUrl;
+                audioPlayer.play().catch(() => {});
+            });
+        }
+
+        function handleStreamFallback() {
+            if (currentMode === 'liveStream') {
+                const station = liveRadioStations[currentLiveIndex];
+                if (audioPlayer.src !== station.fallbackUrl) {
+                    audioPlayer.src = station.fallbackUrl;
+                    audioPlayer.play().catch(() => {});
+                    showNotification('Sinal Ajustado', 'Conectado ao canal de áudio reserva de alta estabilidade!', 'success');
+                }
+            } else {
+                showNotification('Pulando Faixa', 'Esta faixa estava indisponível. Tocando a próxima do roteiro!', 'info');
+                setTimeout(playNext, 1200);
+            }
+        }
+
+        function changeLiveStation(val) {
+            if (val === 'roteiro') {
+                playSelectedPlaylistTrack(currentTrackIndex);
+            } else {
+                startGuaranteedRadioStream(parseInt(val));
+            }
+        }
+
+        function loadTrackToStage(category, index, autoPlay = true) {
+            currentMode = 'playlist';
+            currentCategory = category;
+            const list = appData.playlists[category] || [];
+            if (list.length === 0) return;
+
+            if (index >= list.length) index = 0;
+            if (index < 0) index = list.length - 1;
+            currentTrackIndex = index;
+
+            const track = list[currentTrackIndex];
+
+            // Atualiza botões de modo no topo do telão
+            document.getElementById('mode-btn-playlist').className = "px-3 py-1 rounded-lg text-xs font-bold bg-brand-primary text-white transition flex items-center gap-1";
+            document.getElementById('mode-btn-stream').className = "px-3 py-1 rounded-lg text-xs font-bold text-gray-300 hover:text-white transition flex items-center gap-1";
+            document.getElementById('live-station-select').value = 'roteiro';
+
+            // Atualiza Textos do Telão e Rodapé
+            const categoryNames = {
+                manha: 'Manhã Sertaneja (06h-12h)',
+                esquenta: 'Esquenta Rodeio (12h-18h)',
+                modao: 'Modão de Viola (18h-00h)',
+                comerciais: 'Comercial / Anúncio Oficial'
+            };
+
+            stageCategory.innerText = categoryNames[category] || 'Programação';
+            stageTitle.innerText = track.title;
+            stageArtist.innerText = track.artist || 'Rádio & TV Web Sertaneja';
+            footerTitle.innerText = `${track.title} - ${track.artist || ''}`;
+
+            // Para ambos os players antes de trocar
+            audioPlayer.pause();
+            videoPlayer.pause();
+            document.getElementById('yt-wrapper').classList.add('hidden');
+            document.getElementById('yt-iframe-Box').innerHTML = '';
+
+            // Verifica se é Vídeo MP4, Link do YouTube ou Áudio MP3
+            const ytId = extractYouTubeID(track.url);
+
+            if (ytId) {
+                // Caso o criador tenha adicionado um link do YouTube permitido
+                visualStage.classList.add('hidden');
+                videoPlayer.classList.add('hidden');
+                const ytWrapper = document.getElementById('yt-wrapper');
+                ytWrapper.classList.remove('hidden');
+                document.getElementById('yt-iframe-Box').innerHTML = `
+                    <iframe class="w-full h-full" src="https://www.youtube.com/embed/${ytId}?autoplay=${autoPlay ? 1 : 0}&rel=0&playsinline=1" 
+                    frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                `;
+                onMediaPlaybackChange(autoPlay, 'Vídeo YouTube no Ar');
+            } else if (track.mediaType === 'video' || track.url.endsWith('.mp4') || track.url.startsWith('data:video')) {
+                // Reprodução em Vídeo Nativo no Telão (Perfeito para Comerciais e Clipes)
+                visualStage.classList.add('hidden');
+                videoPlayer.classList.remove('hidden');
+                videoPlayer.src = track.url;
+                if (autoPlay) {
+                    videoPlayer.play().catch(() => {});
+                }
+            } else {
+                // Reprodução em Áudio Nativo com Telão Animado
+                videoPlayer.classList.add('hidden');
+                visualStage.classList.remove('hidden');
+                audioPlayer.src = track.url;
+                if (autoPlay) {
+                    audioPlayer.play().catch(() => {});
+                }
+            }
+
+            renderPlaylistUI();
+        }
+
+        function playSelectedPlaylistTrack(index) {
+            loadTrackToStage(currentCategory, index, true);
+        }
+
+        function selectCategoryAndPlay(category) {
+            switchPlaylistTab(category);
+            loadTrackToStage(category, 0, true);
+            document.getElementById('estudio').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function playNext() {
+            if (currentMode === 'liveStream') {
+                let nextStation = (currentLiveIndex + 1) % liveRadioStations.length;
+                startGuaranteedRadioStream(nextStation);
+            } else {
+                loadTrackToStage(currentCategory, currentTrackIndex + 1, true);
+            }
+        }
+
+        function playPrevious() {
+            if (currentMode === 'liveStream') {
+                let prevStation = (currentLiveIndex - 1 + liveRadioStations.length) % liveRadioStations.length;
+                startGuaranteedRadioStream(prevStation);
+            } else {
+                loadTrackToStage(currentCategory, currentTrackIndex - 1, true);
+            }
+        }
+
+        function onMediaPlaybackChange(playingState, statusMessage) {
+            isPlaying = playingState;
+            updateStatusText(statusMessage);
+
+            if (isPlaying) {
+                mainPlayIcon.className = 'fa-solid fa-pause';
+                footerPlayIcon.className = 'fa-solid fa-pause';
+                stageDisc.classList.add('animate-spin');
+                stageDisc.style.animationDuration = '12s';
+                document.getElementById('footer-eq').classList.replace('opacity-40', 'opacity-100');
+            } else {
+                mainPlayIcon.className = 'fa-solid fa-play ml-1';
+                footerPlayIcon.className = 'fa-solid fa-play ml-0.5';
+                stageDisc.classList.remove('animate-spin');
+                document.getElementById('footer-eq').classList.replace('opacity-100', 'opacity-40');
+            }
+        }
+
+        function updateStatusText(text) {
+            footerStatus.innerText = text;
+            statusBadge.innerText = text;
+        }
+
+        function updateProgressBar(mediaElement) {
+            if (currentMode === 'liveStream' || !mediaElement.duration || !isFinite(mediaElement.duration)) {
+                timeCurrent.innerText = formatSeconds(mediaElement.currentTime || 0);
+                timeTotal.innerText = "AO VIVO";
+                seekSlider.value = 100;
+                return;
+            }
+            const pct = (mediaElement.currentTime / mediaElement.duration) * 100;
+            seekSlider.value = pct || 0;
+            timeCurrent.innerText = formatSeconds(mediaElement.currentTime);
+            timeTotal.innerText = formatSeconds(mediaElement.duration);
+        }
+
+        function formatSeconds(sec) {
+            const m = Math.floor(sec / 60);
+            const s = Math.floor(sec % 60);
+            return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        function changeVolume(val) {
+            const v = val / 100;
+            audioPlayer.volume = v;
+            videoPlayer.volume = v;
+            const icon = document.getElementById('volume-icon');
+            if (v === 0) icon.className = 'fa-solid fa-volume-xmark text-red-500';
+            else if (v < 0.5) icon.className = 'fa-solid fa-volume-low';
+            else icon.className = 'fa-solid fa-volume-high';
+        }
+
+        function toggleMute() {
+            const muted = !audioPlayer.muted;
+            audioPlayer.muted = muted;
+            videoPlayer.muted = muted;
+            document.getElementById('volume-icon').className = muted ? 'fa-solid fa-volume-xmark text-red-500' : 'fa-solid fa-volume-high';
+        }
+
+        // Visualizador de Ondas Sonoras no Canvas
+        function initCanvasVisualizer() {
+            const canvas = document.getElementById('audio-canvas');
+            const ctx = canvas.getContext('2d');
+            const bars = 38;
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const barWidth = (canvas.width / bars) - 4;
+
+                for (let i = 0; i < bars; i++) {
+                    const height = isPlaying 
+                        ? Math.floor(Math.random() * (canvas.height - 15)) + 10 
+                        : 6;
+                    const x = i * (barWidth + 4);
+                    const y = canvas.height - height;
+
+                    const grad = ctx.createLinearGradient(0, canvas.height, 0, 0);
+                    grad.addColorStop(0, '#ea580c');
+                    grad.addColorStop(1, '#f59e0b');
+
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.roundRect(x, y, barWidth, height, 4);
+                    ctx.fill();
+                }
+            }
+            setInterval(draw, 120);
+        }
+
+        // ==========================================
+        // RENDERIZAÇÃO DA INTERFACE (ROTEIRO, LOJAS, SHOWS)
+        // ==========================================
+        function switchPlaylistTab(category) {
+            currentCategory = category;
+            document.querySelectorAll('.playlist-tab').forEach(btn => {
+                btn.className = "playlist-tab px-4 py-2.5 bg-neutral-800 text-gray-300 hover:bg-neutral-700 text-xs sm:text-sm font-extrabold rounded-xl whitespace-nowrap transition flex items-center gap-2";
+            });
+            const activeTab = document.getElementById('tab-' + category);
+            if (activeTab) {
+                activeTab.className = "playlist-tab px-4 py-2.5 bg-brand-primary text-white text-xs sm:text-sm font-extrabold rounded-xl whitespace-nowrap transition flex items-center gap-2 shadow-lg shadow-brand-primary/30";
+            }
+            renderPlaylistUI();
+        }
+
+        function renderPlaylistUI() {
+            const container = document.getElementById('playlist-container');
+            container.innerHTML = '';
+            const list = appData.playlists[currentCategory] || [];
+
+            if (list.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-500 text-sm">
+                        Nenhuma faixa cadastrada nesta aba ainda.
+                    </div>
+                `;
+                return;
+            }
+
+            list.forEach((item, index) => {
+                const isCurrent = (currentMode === 'playlist' && index === currentTrackIndex);
+                const isVideo = item.mediaType === 'video' || (item.url && item.url.endsWith('.mp4'));
+
+                const row = document.createElement('div');
+                row.className = `p-3.5 rounded-2xl flex items-center justify-between gap-3 border transition cursor-pointer ${
+                    isCurrent 
+                    ? 'bg-brand-primary/15 border-brand-primary shadow-md' 
+                    : 'bg-neutral-900/70 border-neutral-800/80 hover:bg-neutral-800'
+                }`;
+
+                row.innerHTML = `
+                    <div onclick="loadTrackToStage('${currentCategory}', ${index}, true)" class="flex items-center gap-3.5 min-w-0 flex-grow">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                            isCurrent ? 'bg-brand-primary text-white' : 'bg-neutral-800 text-gray-400'
+                        }">
+                            <i class="fa-solid ${isCurrent && isPlaying ? 'fa-volume-high animate-pulse' : (isVideo ? 'fa-video' : 'fa-play text-xs')}"></i>
+                        </div>
+                        <div class="min-w-0 flex-grow">
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded ${
+                                    isVideo ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-400'
+                                }">
+                                    ${isVideo ? '🎥 Vídeo / TV' : '🎵 Áudio'}
+                                </span>
+                                ${isCurrent ? '<span class="text-[10px] font-black text-brand-primary uppercase">● No Telão</span>' : ''}
+                            </div>
+                            <h4 class="text-sm font-bold text-white truncate mt-0.5">${item.title}</h4>
+                            <p class="text-xs text-gray-400 truncate">${item.artist || 'Programação Oficial'}</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <button onclick="loadTrackToStage('${currentCategory}', ${index}, true)" class="px-3 py-1.5 rounded-xl bg-neutral-800 hover:bg-brand-primary text-gray-200 hover:text-white text-xs font-bold transition">
+                            Tocar
+                        </button>
+                        <button onclick="deleteTrack('${currentCategory}', ${index})" class="creator-only w-8 h-8 rounded-xl bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white flex items-center justify-center transition" title="Excluir faixa">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function renderPartnersUI() {
+            const grid = document.getElementById('partners-grid');
+            grid.innerHTML = '';
+
+            appData.partners.forEach((p, idx) => {
+                const card = document.createElement('div');
+                card.className = "bg-brand-card border border-neutral-800 rounded-3xl overflow-hidden shadow-lg flex flex-col justify-between group hover:border-brand-primary/50 transition";
+                card.innerHTML = `
+                    <div>
+                        <div class="relative aspect-video bg-neutral-900 overflow-hidden">
+                            <img src="${p.img || 'https://placehold.co/600x340/1f1f24/ea580c?text=Parceiro+Oficial'}" 
+                                 onerror="this.src='https://placehold.co/600x340/1f1f24/ea580c?text=Loja+Parceira'" 
+                                 alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <span class="absolute top-3 left-3 bg-black/80 backdrop-blur-md text-brand-gold text-[10px] font-black uppercase px-2.5 py-1 rounded-lg border border-neutral-700">
+                                ${p.category || 'Parceiro Oficial'}
+                            </span>
+                            <button onclick="deletePartner(${idx})" class="creator-only absolute top-3 right-3 w-8 h-8 rounded-lg bg-red-600 text-white flex items-center justify-center shadow-lg" title="Remover Parceiro">
+                                <i class="fa-solid fa-trash-can text-xs"></i>
+                            </button>
+                        </div>
+                        <div class="p-5">
+                            <h4 class="text-base font-extrabold text-white">${p.name}</h4>
+                            <p class="text-xs text-gray-400 mt-1.5 leading-relaxed">${p.desc}</p>
+                        </div>
+                    </div>
+                    <div class="px-5 pb-5">
+                        <a href="${p.link || '#'}" onclick="${p.link ? '' : "handleSocialClick(event, 'whatsapp')"}" target="${p.link ? '_blank' : '_self'}" class="w-full py-2.5 px-4 rounded-xl bg-neutral-800 hover:bg-brand-primary text-white text-xs font-extrabold flex items-center justify-center gap-2 transition">
+                            <i class="fa-brands fa-whatsapp text-sm text-green-400"></i> Ver Ofertas / Contato
+                        </a>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            // Card "+" Exclusivo para o Criador adicionar mais lojas direto no grid
+            const addCard = document.createElement('div');
+            addCard.onclick = () => openModal('modal-parceiro');
+            addCard.className = "creator-only bg-brand-dark border-2 border-dashed border-amber-500/40 hover:border-brand-primary rounded-3xl p-8 flex flex-col items-center justify-center text-center cursor-pointer transition min-h-[260px] group";
+            addCard.innerHTML = `
+                <div class="w-16 h-16 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mb-3 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-plus text-2xl text-brand-gold"></i>
+                </div>
+                <h4 class="text-base font-black text-white">+ Adicionar Nova Loja ou Banner</h4>
+                <p class="text-xs text-gray-400 mt-1 max-w-xs">Clique aqui para colocar o banner de uma Casa Agropecuária, Mercado ou Loja Digital.</p>
+            `;
+            grid.appendChild(addCard);
+        }
+
+        function renderEventsUI() {
+            const grid = document.getElementById('events-grid');
+            grid.innerHTML = '';
+
+            appData.events.forEach((ev, idx) => {
+                const card = document.createElement('div');
+                card.className = "bg-brand-card border border-neutral-800 rounded-3xl p-4 sm:p-5 flex flex-col sm:flex-row items-center gap-4 shadow-lg hover:border-brand-primary/50 transition relative";
+                card.innerHTML = `
+                    <button onclick="deleteEvent(${idx})" class="creator-only absolute top-3 right-3 w-8 h-8 rounded-lg bg-red-600 text-white flex items-center justify-center shadow-lg z-10" title="Excluir Show">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                    <img src="${ev.img || 'https://placehold.co/300x300/1f1f24/ea580c?text=Show'}" 
+                         onerror="this.src='https://placehold.co/300x300/1f1f24/ea580c?text=Rodeio'" 
+                         alt="${ev.name}" class="w-full sm:w-32 h-40 sm:h-32 rounded-2xl object-cover flex-shrink-0 border border-neutral-700">
+                    <div class="flex-grow text-center sm:text-left">
+                        <div class="inline-flex items-center gap-1.5 text-[11px] font-extrabold text-brand-gold bg-amber-500/10 px-2.5 py-0.5 rounded-md mb-1">
+                            <i class="fa-regular fa-calendar"></i> ${ev.date} • ${ev.time}
+                        </div>
+                        <h4 class="text-base sm:text-lg font-black text-white leading-snug">${ev.name}</h4>
+                        <p class="text-xs text-gray-400 mt-1"><i class="fa-solid fa-location-dot text-brand-primary mr-1"></i> ${ev.location}</p>
+                        <div class="mt-3">
+                            <a href="${ev.link || '#'}" onclick="${ev.link ? '' : "handleSocialClick(event, 'whatsapp')"}" target="${ev.link ? '_blank' : '_self'}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-primary hover:bg-orange-700 text-white text-xs font-extrabold transition shadow">
+                                <i class="fa-solid fa-ticket"></i> Garantir Ingresso / Info
+                            </a>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            // Card "+" Exclusivo do Modo Criador para Eventos
+            const addEvCard = document.createElement('div');
+            addEvCard.onclick = () => openModal('modal-evento');
+            addEvCard.className = "creator-only bg-brand-dark border-2 border-dashed border-amber-500/40 hover:border-brand-primary rounded-3xl p-6 flex items-center justify-center gap-4 cursor-pointer transition min-h-[150px] group";
+            addEvCard.innerHTML = `
+                <div class="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-calendar-plus text-xl text-brand-gold"></i>
+                </div>
+                <div>
+                    <h4 class="text-base font-black text-white">+ Cadastrar Novo Show ou Rodeio</h4>
+                    <p class="text-xs text-gray-400 mt-0.5">Adicione data, hora, local e cartaz do evento quando fechar parceria.</p>
+                </div>
+            `;
+            grid.appendChild(addEvCard);
+        }
+
+        // ==========================================
+        // FUNÇÕES DO MODO CRIADOR (SALVAR E EDITAR)
+        // ==========================================
+        function handleCreatorButtonClick() {
+            if (isCreatorMode) {
+                toggleCreatorMode();
+            } else {
+                openModal('modal-login');
+            }
+        }
+
+        function confirmCreatorLogin() {
+            const pin = document.getElementById('creator-pin-input').value.trim();
+            if (pin === '1234' || pin.length > 0) {
+                closeModal('modal-login');
+                toggleCreatorMode(true);
+            } else {
+                showNotification('Senha Incorreta', 'Digite a senha padrão 1234 para liberar o Modo Criador.', 'info');
+            }
+        }
+
+        function toggleCreatorMode(forceState) {
+            isCreatorMode = typeof forceState === 'boolean' ? forceState : !isCreatorMode;
+            
+            if (isCreatorMode) {
+                document.body.classList.add('creator-active');
+                document.getElementById('creator-lock-icon').className = 'fa-solid fa-lock-open text-green-400';
+                document.getElementById('creator-btn-text').innerText = 'Modo Criador: ON';
+                showNotification('Modo Criador Ativado!', 'Todos os botões "+" apareceram na tela para você adicionar anúncios, músicas e lojas.', 'success');
+            } else {
+                document.body.classList.remove('creator-active');
+                document.getElementById('creator-lock-icon').className = 'fa-solid fa-lock text-brand-gold';
+                document.getElementById('creator-btn-text').innerText = 'Modo Criador';
+                showNotification('Visão do Ouvinte', 'Os botões de edição foram ocultados. É assim que o público vê sua rádio!', 'info');
+            }
+        }
+
+        function toggleMediaSourceInput(val) {
+            document.getElementById('box-midia-arquivo').classList.toggle('hidden', val !== 'arquivo');
+            document.getElementById('box-midia-link').classList.toggle('hidden', val !== 'link');
+        }
+
+        function saveNewMedia(e) {
+            e.preventDefault();
+            const cat = document.getElementById('midia-categoria').value;
+            const title = document.getElementById('midia-titulo').value.trim();
+            const artist = document.getElementById('midia-artista').value.trim() || 'Anúncio / Programação';
+            const sourceType = document.getElementById('midia-tipo-fonte').value;
+
+            if (sourceType === 'arquivo') {
+                const fileInput = document.getElementById('midia-file-input');
+                if (!fileInput.files || !fileInput.files[0]) {
+                    showNotification('Escolha um Arquivo', 'Selecione um vídeo (MP4) ou áudio (MP3) do seu aparelho.', 'info');
+                    return;
+                }
+                const file = fileInput.files[0];
+                const objectUrl = URL.createObjectURL(file);
+                const isVid = file.type.startsWith('video');
+
+                addMediaToState(cat, {
+                    id: 'custom_' + Date.now(),
+                    title: title,
+                    artist: artist,
+                    mediaType: isVid ? 'video' : 'audio',
+                    url: objectUrl
+                });
+            } else {
+                const url = document.getElementById('midia-url-input').value.trim();
+                if (!url) {
+                    showNotification('Digite o Link', 'Cole o endereço do áudio ou vídeo.', 'info');
+                    return;
+                }
+                const isVid = url.endsWith('.mp4') || extractYouTubeID(url) !== null;
+                addMediaToState(cat, {
+                    id: 'custom_' + Date.now(),
+                    title: title,
+                    artist: artist,
+                    mediaType: isVid ? 'video' : 'audio',
+                    url: url
+                });
+            }
+        }
+
+        function addMediaToState(cat, newTrack) {
+            if (!appData.playlists[cat]) appData.playlists[cat] = [];
+            appData.playlists[cat].unshift(newTrack);
+            saveStateToLocalStorage();
+            closeModal('modal-midia');
+            switchPlaylistTab(cat);
+            loadTrackToStage(cat, 0, true);
+            showNotification('Adicionado com Sucesso!', `"${newTrack.title}" já está tocando no telão!`, 'success');
+            document.getElementById('midia-titulo').value = '';
+            document.getElementById('midia-url-input').value = '';
+        }
+
+        function deleteTrack(cat, idx) {
+            appData.playlists[cat].splice(idx, 1);
+            saveStateToLocalStorage();
+            renderPlaylistUI();
+            showNotification('Item Removido', 'A faixa foi removida do roteiro.', 'info');
+        }
+
+        function saveNewPartner(e) {
+            e.preventDefault();
+            const name = document.getElementById('parceiro-nome').value.trim();
+            const category = document.getElementById('parceiro-categoria').value.trim() || 'Parceiro Oficial';
+            const desc = document.getElementById('parceiro-desc').value.trim();
+            const link = document.getElementById('parceiro-link').value.trim();
+            const urlInput = document.getElementById('parceiro-img-url').value.trim();
+            const fileInput = document.getElementById('parceiro-file');
+
+            const finalizePartner = (imgSrc) => {
+                appData.partners.unshift({
+                    id: 'p_' + Date.now(),
+                    name, category, desc, link,
+                    img: imgSrc || 'https://images.unsplash.com/photo-1500595046743-cd271d694d30?auto=format&fit=crop&w=600&q=80'
+                });
+                saveStateToLocalStorage();
+                renderPartnersUI();
+                closeModal('modal-parceiro');
+                showNotification('Parceiro Publicado!', `O banner de "${name}" já está na vitrine da rádio!`, 'success');
+                e.target.reset();
+            };
+
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (ev) => finalizePartner(ev.target.result);
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                finalizePartner(urlInput);
+            }
+        }
+
+        function deletePartner(idx) {
+            appData.partners.splice(idx, 1);
+            saveStateToLocalStorage();
+            renderPartnersUI();
+            showNotification('Banner Removido', 'O parceiro foi removido da vitrine.', 'info');
+        }
+
+        function saveNewEvent(e) {
+            e.preventDefault();
+            const name = document.getElementById('evento-nome').value.trim();
+            const date = document.getElementById('evento-data').value.trim();
+            const time = document.getElementById('evento-hora').value.trim();
+            const location = document.getElementById('evento-local').value.trim();
+            const link = document.getElementById('evento-link').value.trim();
+            const urlInput = document.getElementById('evento-img-url').value.trim();
+            const fileInput = document.getElementById('evento-file');
+
+            const finalizeEvent = (imgSrc) => {
+                appData.events.unshift({
+                    id: 'ev_' + Date.now(),
+                    name, date, time, location, link,
+                    img: imgSrc || 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=700&q=80'
+                });
+                saveStateToLocalStorage();
+                renderEventsUI();
+                closeModal('modal-evento');
+                showNotification('Show Cadastrado!', `"${name}" foi adicionado à Agenda de Shows!`, 'success');
+                e.target.reset();
+            };
+
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (ev) => finalizeEvent(ev.target.result);
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                finalizeEvent(urlInput);
+            }
+        }
+
+        function deleteEvent(idx) {
+            appData.events.splice(idx, 1);
+            saveStateToLocalStorage();
+            renderEventsUI();
+            showNotification('Evento Removido', 'O show foi removido da agenda.', 'info');
+        }
+
+        // Configuração de WhatsApp e Redes Sociais
+        function saveSocialSettings(e) {
+            e.preventDefault();
+            appData.settings.radioName = document.getElementById('conf-radio-name').value.trim() || 'RÁDIO WEB';
+            appData.settings.whatsapp = document.getElementById('conf-whatsapp').value.replace(/\D/g, '');
+            appData.settings.youtube = document.getElementById('conf-youtube').value.trim();
+            saveStateToLocalStorage();
+            applySocialSettings();
+            closeModal('modal-redes');
+            showNotification('Contatos Atualizados!', 'Seus links de WhatsApp e YouTube foram salvos.', 'success');
+        }
+
+        function applySocialSettings() {
+            document.getElementById('conf-radio-name').value = appData.settings.radioName || 'RÁDIO WEB';
+            document.getElementById('conf-whatsapp').value = appData.settings.whatsapp || '';
+            document.getElementById('conf-youtube').value = appData.settings.youtube || '';
+            document.getElementById('header-radio-name').innerHTML = appData.settings.radioName;
+        }
+
+        function handleSocialClick(e, network) {
+            e.preventDefault();
+            if (network === 'whatsapp') {
+                if (appData.settings.whatsapp) {
+                    window.open(`https://wa.me/${appData.settings.whatsapp}?text=Ol%C3%A1!%20Estou%20ouvindo%20a%20R%C3%A1dio%20Web%20e%20quero%20falar%20com%20o%20est%C3%BAdio!`, '_blank');
+                } else {
+                    showNotification('WhatsApp em Breve', 'O número oficial de WhatsApp da rádio será conectado em breve! (Ative o Modo Criador para configurar).', 'info');
+                }
+            } else if (network === 'youtube') {
+                if (appData.settings.youtube) {
+                    window.open(appData.settings.youtube, '_blank');
+                } else {
+                    showNotification('Canal no YouTube', 'O link do canal oficial será adicionado em breve pelo criador!', 'info');
+                }
+            }
+        }
+
+        // Persistência e Backup
+        function saveStateToLocalStorage() {
+            try {
+                localStorage.setItem('radioweb_playlists', JSON.stringify(appData.playlists));
+                localStorage.setItem('radioweb_partners', JSON.stringify(appData.partners));
+                localStorage.setItem('radioweb_events', JSON.stringify(appData.events));
+                localStorage.setItem('radioweb_settings', JSON.stringify(appData.settings));
+            } catch (err) {
+                console.warn('Limite de armazenamento local atingido.');
+            }
+        }
+
+        function exportBackup() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
+            const a = document.createElement('a');
+            a.setAttribute("href", dataStr);
+            a.setAttribute("download", "backup_radio_web.json");
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            showNotification('Backup Salvo!', 'O arquivo com todas as suas configurações foi baixado.', 'success');
+        }
+
+        // Utilitários de Modal e Notificação
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function extractYouTubeID(url) {
+            if (!url) return null;
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        function showNotification(title, message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const icon = type === 'success' ? 'fa-circle-check text-green-400' : 'fa-circle-info text-brand-gold';
+            
+            toast.className = 'pointer-events-auto bg-neutral-900/95 backdrop-blur-md border border-neutral-700 rounded-2xl p-4 shadow-2xl flex items-start gap-3 transition-all duration-300';
+            toast.innerHTML = `
+                <i class="fa-solid ${icon} text-xl mt-0.5"></i>
+                <div class="flex-grow">
+                    <h4 class="text-white text-xs sm:text-sm font-extrabold">${title}</h4>
+                    <p class="text-gray-300 text-xs mt-0.5 leading-relaxed">${message}</p>
+                </div>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 4500);
+        }
+    </script>
+</body>
+</html>
+```
